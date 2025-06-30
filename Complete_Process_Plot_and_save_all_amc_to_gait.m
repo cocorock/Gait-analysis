@@ -67,8 +67,8 @@ Data_linear = create_linear_kinematics_structure(linear_kinematics);
 plot_linear_kinematics_positions(linear_kinematics, processed_data, false);
 
 % Save the structured linear kinematics data.
-Data_filteredv3 = create_demos_structure_per_cycleV3(processed_data, 10);
-save_linear_kinematics_structured(linear_kinematics, 10);
+structData = struct_kinematrics(linear_kinematics, size(linear_kinematics, 2));
+save_linear_kinematics_structured(structData, 8);
 
 fprintf('\n===  Process Plot and Save All AMC Files ===\n');
 

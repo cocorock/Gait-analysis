@@ -1,0 +1,53 @@
+# Gait Analysis from MOCAP Data
+
+This project provides a suite of MATLAB scripts to process, analyze, and visualize motion capture (MOCAP) data from AMC files, specifically focusing on human gait analysis.
+
+## Getting Started
+
+### Prerequisites
+
+- MATLAB
+
+### How to Run
+
+The analysis pipeline can be executed by running the main scripts from the MATLAB command window. Ensure that the MATLAB path includes the project's root directory and the necessary subdirectories.
+
+## Main Scripts
+
+The primary scripts for running the gait analysis are located in the root directory:
+
+-   `Complete_Process_Plot_and_save_all_amc_to_gait.m`: This is the main script for the full analysis pipeline. It handles data processing, filtering, plotting of various kinematic and kinetic variables, and saving the results.
+-   `Process_and_save_proccessed_data.m`: This script is a subset of the main script, focused on processing and saving the data without generating all the plots.
+
+## Function Reference (`Functions_rev/`)
+
+The core logic of the analysis is encapsulated in the functions located in the `Functions_rev/` directory. Below is a description of each function:
+
+-   `apply_filtering_and_derivatives.m`: Applies a 6Hz 4th-order Butterworth filter to the raw gait cycle data and calculates the first and second derivatives (velocity and acceleration).
+-   `calculate_linear_kinematics.m`: Computes the forward kinematics (position, velocity, and acceleration) of a 2-link planar arm model representing the leg. It also rotates the kinematics by a specified angle `phi`.
+-   `create_demos_structure_per_cycleV2.m`: Organizes the processed gait data into a cell array, where each cell represents a single gait cycle containing position, velocity, and acceleration for both right and left legs.
+-   `create_filtered_trajectory_plots.m`: Generates and saves plots of the filtered gait trajectories for hip and knee flexion.
+-   `create_linear_kinematics_structure.m`: Converts the output of `calculate_linear_kinematics` into a simpler cell array structure containing position and velocity.
+-   `create_output_directorie.m`: Creates the `Plots and Figs` and `Gait Data` directories if they don't already exist.
+-   `create_phase_plots.m`: Creates and saves phase plots (position vs. velocity) for the hip and knee joints.
+-   `create_trajectory_plots.m`: Generates and saves plots of the original, unfiltered gait trajectories.
+-   `extract_gait_cycles_knee_minima_robust.m`: A robust function to extract individual gait cycles from the raw data based on knee angle minima.
+-   `get_amc_files.m`: Searches the `AMC/` directory and returns a list of all `.amc` files.
+-   `plot_angular_kinematics_positions.m`: Plots the angular positions (hip vs. knee) for all gait cycles.
+-   `plot_joint_cycles.m`: Plots a comparison of the joint cycles before and after filtering.
+-   `plot_linear_kinematics_positions.m`: Plots the end-effector trajectories (x vs. y) for all gait cycles, separating right and left legs.
+-   `process_all_amc_files.m`: The main processing function that iterates through all AMC files, extracts gait cycles, and collects them into a unified data structure.
+-   `reshape_leg_data.m`: Reshapes the data structure to separate left and right leg data into individual cells, preparing it for `calculate_linear_kinematics`.
+-   `reshapeProcessedData.m`: Reshapes the processed data from a matrix format to a single row vector for each joint, facilitating certain types of analysis and plotting.
+-   `save_linear_kinematics.m`: Saves the calculated linear kinematics data to a `.mat` file.
+-   `save_linear_kinematics_structured.m`: Saves the linear kinematics data in a structured format.
+-   `save_processed_data.m`: Saves the processed angular data into `.mat` files in different formats.
+
+## Directory Structure
+
+-   `AMC/`: Contains the raw `.amc` motion capture files.
+-   `C3D/`: Contains data in the C3D format.
+-   `Functions_rev/`: Contains all the core MATLAB functions for the analysis.
+-   `Gait Data/`: The output directory for all saved `.mat` data files.
+-   `Plots and Figs/`: The output directory for all generated plots and figures.
+-   `not used/`: Contains older or deprecated versions of functions.

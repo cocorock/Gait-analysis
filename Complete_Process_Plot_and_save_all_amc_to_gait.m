@@ -54,11 +54,13 @@ Data_filteredv2 = create_demos_structure_per_cycleV2(processed_data);
 % Plot the angular kinematics positions.
 plot_angular_kinematics_positions(Data_filteredv2, false);
 
+reshaped_filtered_data = reshape_leg_data(Data_filteredv2);
+
 % Calculate linear kinematics from the filtered 'Data' structure.
-linear_kinematics = calculate_linear_kinematics(Data_filteredv2, -90);
+linear_kinematics = calculate_linear_kinematics(reshaped_filtered_data, -90);
 
 % Save the calculated linear kinematics of the gait cycles.
-save_linear_kinematics(linear_kinematics, 25);
+save_linear_kinematics(linear_kinematics, 50);
 
 % Create a 'Data' like structure for the linear kinematics.
 Data_linear = create_linear_kinematics_structure(linear_kinematics);
@@ -68,7 +70,7 @@ plot_linear_kinematics_positions(linear_kinematics, processed_data, false);
 
 % Save the structured linear kinematics data.
 structData = struct_kinematrics(linear_kinematics, size(linear_kinematics, 2));
-save_linear_kinematics_structured(structData, 8);
+save_linear_kinematics_structured(structData, 10);
 
 fprintf('\n===  Process Plot and Save All AMC Files ===\n');
 

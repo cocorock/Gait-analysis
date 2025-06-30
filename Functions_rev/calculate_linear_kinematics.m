@@ -1,24 +1,27 @@
-%% calculate_linear_kinematics: Calculates linear kinematics for a 2-link planar arm.
+%% calculate_linear_kinematics: Calculates and rotates linear kinematics for a 2-link planar arm.
 %
 % Credits:
 %   Victor Ferman, Adrolab FEEC/UNICAMP
 %
 % Description:
 %   This function computes the forward kinematics (position, velocity, and
-%   acceleration) of the end-effector of a 2-link planar arm, given the
-%   joint angles, velocities, and accelerations.
+%   acceleration) of the end-effector of a 2-link planar arm. It then
+%   rotates the resulting kinematic vectors by a specified angle phi.
+%   The joint angles, velocities, and accelerations are provided for a
+%   single leg (e.g., right or left).
 %
 % Input:
-%   demos - (1 x N_cycles) cell array: Each cell contains a struct with fields:
-%             - pos: (2 x M) matrix of joint angles [hip; knee] in degrees.
-%             - vel: (2 x M) matrix of joint velocities in degrees/s.
-%             - acc: (2 x M) matrix of joint accelerations in degrees/s^2.
+%   Data - (1 x N_cycles) cell array: Each cell contains a struct with fields:
+%          - pos: (2 x M) matrix of joint angles [hip; knee] in degrees.
+%          - vel: (2 x M) matrix of joint velocities in degrees/s.
+%          - acc: (2 x M) matrix of joint accelerations in degrees/s^2.
+%   phi  - scalar: The rotation angle in degrees.
 %
 % Output:
 %   linear_kinematics - (1 x N_cycles) cell array: Each cell contains a struct with fields:
-%                         - pos: (2 x M) matrix of end-effector positions [x; y].
-%                         - vel: (2 x M) matrix of end-effector velocities [x_dot; y_dot].
-%                         - acc: (2 x M) matrix of end-effector accelerations [x_ddot; y_ddot].
+%                         - pos: (2 x M) matrix of rotated end-effector positions [x'; y'].
+%                         - vel: (2 x M) matrix of rotated end-effector velocities [x_dot'; y_dot'].
+%                         - acc: (2 x M) matrix of rotated end-effector accelerations [x_ddot'; y_ddot'].
 
 function linear_kinematics = calculate_linear_kinematics(Data, phi)
     

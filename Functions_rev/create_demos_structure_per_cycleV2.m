@@ -1,10 +1,10 @@
-%% create_demos_structure_per_cycleV2: Creates a 'demos' structure from processed gait data.
+%% create_demos_structure_per_cycleV2: Creates a 'Data' structure from processed gait data.
 %
 % Credits:
 %   Victor Ferman, Adrolab FEEC/UNICAMP
 %
 % Description:
-%   This function organizes processed gait cycle data into a 'demos' cell
+%   This function organizes processed gait cycle data into a 'Data' cell
 %   array, where each cell represents a single gait cycle. Each cycle's struct
 %   contains the position, velocity, and acceleration for the right and left hip
 %   and knee.
@@ -13,15 +13,15 @@
 %   processed_data - struct: A structure containing filtered gait data and derivatives.
 %                     See 'apply_filtering_and_derivatives.m' for details.
 %                     It must contain fields like:
-%                       - filtered.right_hip_cycles: (N x 200) matrix.
-%                       - derivatives.right_hip_velocity: (N x 200) matrix.
+%                       - filtered.right_hip_cycles: (N x M) matrix.
+%                       - derivatives.right_hip_velocity: (N x M) matrix.
 %                       - ... and so on for other joints.
 %
 % Output:
-%   demos - (1 x N_cycles) cell array: Each cell contains a struct with fields:
-%             - pos: (4 x 200) matrix [rh; rk; lh; lk] of joint angles.
-%             - vel: (4 x 200) matrix of joint velocities.
-%             - acc: (4 x 200) matrix of joint accelerations.
+%   Data - (1 x N_cycles) cell array: Each cell contains a struct with fields:
+%             - pos: (4 x M) matrix [rh; rk; lh; lk] of joint angles.
+%             - vel: (4 x M) matrix of joint velocities.
+%             - acc: (4 x M) matrix of joint accelerations.
 
 function demos = create_demos_structure_per_cycleV2(processed_data)
    % Count the leg with less gait cycles 

@@ -1,7 +1,7 @@
 % Process all AMC files and plot all gait cycles together
 % This script finds all .amc files, extracts gait cycles, and plots them all overlaid
 
-close all; clear all; clc
+close all; clear; clc
 %% Get all AMC files in AMC folder
 fprintf('Searching for AMC files in AMC folder...\n');
 amc_files = dir('AMC/*.amc');

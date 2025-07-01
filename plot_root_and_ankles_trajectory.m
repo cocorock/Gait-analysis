@@ -27,15 +27,33 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
     right_ankle_pos = zeros(size(root_pos));
 
     for i = 1:size(D, 1)
-        % Left leg
         hip_pos = root_pos(i, :);
-        left_knee_pos(i, :) = hip_pos + bone_lengths.lfemur * [sind(lfemur_rot(i, 2)), cosd(lfemur_rot(i, 2)), 0];
-        left_ankle_pos(i, :) = left_knee_pos(i, :) + bone_lengths.ltibia * [sind(ltibia_rot(i, 2)), cosd(ltibia_rot(i, 2)), 0];
 
-        % Right leg
-        right_knee_pos(i, :) = hip_pos + bone_lengths.rfemur * [sind(rfemur_rot(i, 2)), cosd(rfemur_rot(i, 2)), 0];
-        right_ankle_pos(i, :) = right_knee_pos(i, :) + bone_lengths.rtibia * [sind(rtibia_rot(i, 2)), cosd(rtibia_rot(i, 2)), 0];
+        % Left leg kinematics with hip offset
+        left_hip_pos = hip_pos - [bone_lengths.lhipjoint2, 0, 0];
+        knee_angle_l = lfemur_rot(i, 2);
+        ankle_angle_l = ltibia_rot(i, 2);
+        total_ankle_angle_l = knee_angle_l + ankle_angle_l;
+
+        left_knee_pos(i, :) = left_hip_pos + bone_lengths.lfemur * [0, -cosd(knee_angle_l), sind(knee_angle_l)];
+        left_ankle_pos(i, :) = left_knee_pos(i, :) + bone_lengths.ltibia * [0, -cosd(total_ankle_angle_l), sind(total_ankle_angle_l)];
+
+        % Right leg kinematics with hip offset
+        right_hip_pos = hip_pos + [bone_lengths.rhipjoint2, 0, 0];
+        knee_angle_r = rfemur_rot(i, 2);
+        ankle_angle_r = rtibia_rot(i, 2);
+        total_ankle_angle_r = knee_angle_r + ankle_angle_r;
+
+        right_knee_pos(i, :) = right_hip_pos + bone_lengths.rfemur * [0, -cosd(knee_angle_r), sind(knee_angle_r)];
+        right_ankle_pos(i, :) = right_knee_pos(i, :) + bone_lengths.rtibia * [0, -cosd(total_ankle_angle_r), sind(total_ankle_angle_r)];
     end
+
+    % Rotate all data 90 degrees around the X-axis
+    root_pos = rotate_data_x90(root_pos);
+    left_knee_pos = rotate_data_x90(left_knee_pos);
+    right_knee_pos = rotate_data_x90(right_knee_pos);
+    left_ankle_pos = rotate_data_x90(left_ankle_pos);
+    right_ankle_pos = rotate_data_x90(right_ankle_pos);
 
     % Create time vector (frame numbers)
     frames = 1:size(D, 1);

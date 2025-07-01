@@ -1,9 +1,9 @@
 function lengths = read_asf_lengths(asf_file)
-% Parses an ASF file to extract the lengths of the leg bones.
+% Parses an ASF file to extract the lengths of the leg and hip bones.
 % Input: asf_file - path to the .asf file
-% Output: lengths - a struct with fields lfemur, ltibia, rfemur, rtibia
+% Output: lengths - a struct with fields lfemur, ltibia, rfemur, rtibia, lhipjoint, rhipjoint
 
-    lengths = struct('lfemur', 0, 'ltibia', 0, 'rfemur', 0, 'rtibia', 0);
+    lengths = struct('lfemur', 0, 'ltibia', 0, 'rfemur', 0, 'rtibia', 0, 'lhipjoint', 0, 'rhipjoint', 0);
     fid = fopen(asf_file, 'r');
     if fid == -1
         error('Cannot open ASF file: %s', asf_file);
@@ -47,6 +47,10 @@ function lengths = read_asf_lengths(asf_file)
                         lengths.rfemur = scaled_len;
                     case 'rtibia'
                         lengths.rtibia = scaled_len;
+                    case 'lhipjoint'
+                        lengths.lhipjoint = scaled_len;
+                    case 'rhipjoint'
+                        lengths.rhipjoint = scaled_len;
                 end
             end
         end

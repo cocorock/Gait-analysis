@@ -4,7 +4,7 @@ function plot_root_motion(D)
 % No rotation applied, only scaling
 
 % Extract and scale root position (columns 1-3)
-root_pos = D(:, 1:3) * 2.223 * 25.4 / 1000;  % Position in meters
+root_pos = D(:, 1:3) * 0.45 * 25.4 / 1000;  % Position in meters. Using 0.45 scale (length in inches) from 39.asf.
 root_rot = D(:, 4:6);  % Rotation data (degrees)
 
 % Create time vector (frame numbers)

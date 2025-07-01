@@ -2,6 +2,21 @@
 
 This project provides a suite of MATLAB scripts to process, analyze, and visualize motion capture (MOCAP) data from AMC files, specifically focusing on human gait analysis.
 
+## Data Source
+
+The motion capture data (AMC files) used in this project was obtained from the [Carnegie Mellon University Motion Capture Database](https://mocap.cs.cmu.edu/search.php?maincat=3&subcat=2). Specifically, the trials from the "walking" sets were used.
+
+The following is a notice from the database providers:
+
+> This data is free for use in research projects.
+> You may include this data in commercially-sold products,
+> but you may not resell this data directly, even in converted form.
+> If you publish results obtained using this data, we would appreciate it
+> if you would send the citation to your published paper to jkh+mocap@cs.cmu.edu,
+> and also would add this text to your acknowledgments section:
+> The data used in this project was obtained from mocap.cs.cmu.edu.
+> The database was created with funding from NSF EIA-0196217.
+
 ## Getting Started
 
 ### Prerequisites

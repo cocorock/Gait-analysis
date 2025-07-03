@@ -11,7 +11,7 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
     D = amc_to_matrix(amc_file);
 
     % Extract root position and rotation
-    root_pos = D(:, 1:3) * 0.45 * 25.4 / 1000; % Scale to meters
+    root_pos = D(:, 1:3) * 1/0.45 * 25.4 / 1000; % Scale to meters
     root_rot = D(:, 4:6);
 
     % Get joint angles
@@ -27,25 +27,43 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
     right_ankle_pos = zeros(size(root_pos));
 
     for i = 1:size(D, 1)
+        % Get root position and rotation for the current frame
         hip_pos = root_pos(i, :);
+        rx = root_rot(i, 1);
+        ry = root_rot(i, 2);
+        rz = root_rot(i, 3);
 
-        % Left leg kinematics with hip offset
-        left_hip_pos = hip_pos - [bone_lengths.lhipjoint2, 0, 0];
-        knee_angle_l = lfemur_rot(i, 2);
-        ankle_angle_l = ltibia_rot(i, 2);
-        total_ankle_angle_l = knee_angle_l + ankle_angle_l;
+        % Create rotation matrices
+        R_x = [1, 0, 0; 0, cosd(rx), -sind(rx); 0, sind(rx), cosd(rx)];
+        R_y = [cosd(ry), 0, sind(ry); 0, 1, 0; -sind(ry), 0, cosd(ry)];
+        R_z = [cosd(rz), -sind(rz), 0; sind(rz), cosd(rz), 0; 0, 0, 1];
+        R = R_z * R_y * R_x; % Combined rotation matrix
 
-        left_knee_pos(i, :) = left_hip_pos + bone_lengths.lfemur * [0, -cosd(knee_angle_l), sind(knee_angle_l)];
-        left_ankle_pos(i, :) = left_knee_pos(i, :) + bone_lengths.ltibia * [0, -cosd(total_ankle_angle_l), sind(total_ankle_angle_l)];
+        % Left leg kinematics
+        left_hip_offset = [-bone_lengths.lhipjoint/2, 0, 0]';
+        rotated_left_hip_offset = R * left_hip_offset;
+        left_hip_pos = hip_pos + rotated_left_hip_offset';
 
-        % Right leg kinematics with hip offset
-        right_hip_pos = hip_pos + [bone_lengths.rhipjoint2, 0, 0];
-        knee_angle_r = rfemur_rot(i, 2);
-        ankle_angle_r = rtibia_rot(i, 2);
-        total_ankle_angle_r = knee_angle_r + ankle_angle_r;
+        knee_vec_l = bone_lengths.lfemur * [0, -cosd(lfemur_rot(i, 2)), sind(lfemur_rot(i, 2))]';
+        rotated_knee_vec_l = R * knee_vec_l;
+        left_knee_pos(i, :) = left_hip_pos + rotated_knee_vec_l';
 
-        right_knee_pos(i, :) = right_hip_pos + bone_lengths.rfemur * [0, -cosd(knee_angle_r), sind(knee_angle_r)];
-        right_ankle_pos(i, :) = right_knee_pos(i, :) + bone_lengths.rtibia * [0, -cosd(total_ankle_angle_r), sind(total_ankle_angle_r)];
+        ankle_vec_l = bone_lengths.ltibia * [0, -cosd(lfemur_rot(i, 2) + ltibia_rot(i, 2)), sind(lfemur_rot(i, 2) + ltibia_rot(i, 2))]';
+        rotated_ankle_vec_l = R * ankle_vec_l;
+        left_ankle_pos(i, :) = left_knee_pos(i, :) + rotated_ankle_vec_l';
+
+        % Right leg kinematics
+        right_hip_offset = [bone_lengths.rhipjoint/2, 0, 0]';
+        rotated_right_hip_offset = R * right_hip_offset;
+        right_hip_pos = hip_pos + rotated_right_hip_offset';
+
+        knee_vec_r = bone_lengths.rfemur * [0, -cosd(rfemur_rot(i, 2)), sind(rfemur_rot(i, 2))]';
+        rotated_knee_vec_r = R * knee_vec_r;
+        right_knee_pos(i, :) = right_hip_pos + rotated_knee_vec_r';
+
+        ankle_vec_r = bone_lengths.rtibia * [0, -cosd(rfemur_rot(i, 2) + rtibia_rot(i, 2)), sind(rfemur_rot(i, 2) + rtibia_rot(i, 2))]';
+        rotated_ankle_vec_r = R * ankle_vec_r;
+        right_ankle_pos(i, :) = right_knee_pos(i, :) + rotated_ankle_vec_r';
     end
 
     % Rotate all data 90 degrees around the X-axis

@@ -37,7 +37,7 @@ function save_processed_data_4D(processed_data, output_dir)
     
     joint_fields_filtered = {'right_hip_flex_filtered', 'left_hip_flex_filtered', 'right_knee_flex_filtered', 'left_knee_flex_filtered'};
     joint_fields_velocity = {'right_hip_flex_velocity', 'left_hip_flex_velocity', 'right_knee_flex_velocity', 'left_knee_flex_velocity'};
-    
+
     % --- Process Right Leg Cycles ---
     if isfield(processed_data, 'right_leg_cycles') && ~isempty(processed_data.right_leg_cycles)
         num_right_cycles = length(processed_data.right_leg_cycles);
@@ -45,7 +45,7 @@ function save_processed_data_4D(processed_data, output_dir)
         fprintf('  Processing %d of %d right leg cycles for saving...\n', cycles_to_save_right, num_right_cycles);
         
         % Initialize the 8xN_samples*N_cycles matrix
-        right_leg_data_4D = zeros(9, cycles_to_save_right * interp_length);
+        right_leg_data_4D = zeros(8, cycles_to_save_right * interp_length);
         
         for i = 1:cycles_to_save_right
             current_cycle = processed_data.right_leg_cycles(i);
@@ -53,14 +53,13 @@ function save_processed_data_4D(processed_data, output_dir)
             end_col = i * interp_length;
             
             % Add filtered positions
-            right_leg_data_4D(1, start_col:end_col) = linspace(0, 1, interp_length);
             for j = 1:length(joint_fields_filtered)
-                right_leg_data_4D(j + 1, start_col:end_col) = current_cycle.(joint_fields_filtered{j});
+                right_leg_data_4D(j, start_col:end_col) = current_cycle.(joint_fields_filtered{j});
             end
             
             % Add velocities
             for j = 1:length(joint_fields_velocity)
-                right_leg_data_4D(j + 4 + 1, start_col:end_col) = current_cycle.(joint_fields_velocity{j});
+                right_leg_data_4D(j + 4, start_col:end_col) = current_cycle.(joint_fields_velocity{j});
             end
         end
         
@@ -77,7 +76,7 @@ function save_processed_data_4D(processed_data, output_dir)
         fprintf('  Processing %d of %d left leg cycles for saving...\n', cycles_to_save_left, num_left_cycles);
         
         % Initialize the 8xN_samples*N_cycles matrix
-        left_leg_data_4D = zeros(9, cycles_to_save_left * interp_length);
+        left_leg_data_4D = zeros(8, cycles_to_save_left * interp_length);
         
         for i = 1:cycles_to_save_left
             current_cycle = processed_data.left_leg_cycles(i);
@@ -85,14 +84,13 @@ function save_processed_data_4D(processed_data, output_dir)
             end_col = i * interp_length;
             
             % Add filtered positions
-            left_leg_data_4D(1, start_col:end_col) = linspace(0, 1, interp_length);
             for j = 1:length(joint_fields_filtered)
-                left_leg_data_4D(j + 1, start_col:end_col) = current_cycle.(joint_fields_filtered{j});
+                left_leg_data_4D(j, start_col:end_col) = current_cycle.(joint_fields_filtered{j});
             end
             
             % Add velocities
             for j = 1:length(joint_fields_velocity)
-                left_leg_data_4D(j + 4 + 1, start_col:end_col) = current_cycle.(joint_fields_velocity{j});
+                left_leg_data_4D(j + 4, start_col:end_col) = current_cycle.(joint_fields_velocity{j});
             end
         end
         

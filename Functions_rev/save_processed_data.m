@@ -13,7 +13,7 @@ function save_processed_data(processed_data, file_info, N_Samples)
     save(mat_filename, 'mat_data');
     
     % Save demos with one cell per gait cycle (filtered)
-    data = create_demos_structure_per_cycleV3(processed_data, N_Samples);
+    data = create_demos_structure_per_cycleV3(processed_data, N_Samples);__
     a_format_filename = sprintf('Gait Data/processed_gait_data_angular_%s_samples.mat', string(N_Samples));%%, datestr(now, 'yyyymmdd_HHMMSS'
     save(a_format_filename, 'data');
     

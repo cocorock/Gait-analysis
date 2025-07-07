@@ -28,13 +28,13 @@ amc_files = get_amc_files();
 processed_data = apply_filtering_and_derivatives(all_cycles_data);
 
 % Save the processed data in multiple formats for further analysis.
-save_processed_dataas par(processed_data, file_info, 50);
+save_processed_data(processed_data, file_info, 50);
 
-% Reshape the processed data for further analysis and plotting.
-reshaped_data = reshapeProcessedData(processed_data);
-
-% Plot the joint cycles from the reshaped data.
-plot_joint_cycles(reshaped_data);
+% % Reshape the processed data for further analysis and plotting.
+% reshaped_data = reshapeProcessedData(processed_data);
+% 
+% % Plot the joint cycles from the reshaped data.
+% plot_joint_cycles(reshaped_data);
 
 
 %% plots

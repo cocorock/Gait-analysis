@@ -85,12 +85,12 @@ function linear_kinematics = linear_kinematics_w_pose(Data, phi)
         acc_rotated = R * [x_ddot; y_ddot];
 
         % --- Orientation ---
-        orientation = theta1 + theta2;
-        orientation_vel = theta1_dot + theta2_dot;
-        orientation_acc = theta1_ddot + theta2_ddot;
+        orientation = theta1 + theta2 + phi;
+        orientation_vel = theta1_dot + theta2_dot + phi;
+        orientation_acc = theta1_ddot + theta2_ddot + phi;
 
 
-        % Store results
+        % Store resultsche
         lin_struct.pos = pos_rotated;
         lin_struct.vel = vel_rotated;
         lin_struct.acc = acc_rotated;

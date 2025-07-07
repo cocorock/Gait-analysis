@@ -27,50 +27,48 @@ save('Gait Data/linear_kinematics_w_orientation.mat', 'linear_kinematics_pose');
 
 fprintf('Processing complete.\n');
 
-%% Create Data for Task-Parameterized GMM (TP-GMM)
-fprintf('Creating data structure for TP-GMM...\n');
+%% Create Data for Task-Parameterized GMM (TP-GMM) compatible with demo_TPGMM01
+fprintf('\nCreating data structure s for TP-GMM demo compatibility...\n');
 
-num_cycles = length(linear_kinematics_pose);
-demos = cell(1, num_cycles);
-% Frames will store the transformation for each demonstration's coordinate system
-% We will store the origin position of each new frame.
-% A common way to store frames is using homogeneous transformation matrices.
-% For a simple translation, the matrix is [I, P; 0, 1], where P is the translation vector.
-frames = zeros(3, 3, num_cycles); 
+nbSamples = 5; % Use only the first 5 gait cycles
+nbData = 200; % Number of data points per cycle
+s = struct(); % Initialize empty struct array
 
-for i = 1:num_cycles
-    % Get the data for the current cycle
-    cycle_data = linear_kinematics_pose{i};
+for n = 1:nbSamples
+    cycle_data = linear_kinematics_pose{n};
     
-    % The new frame of reference is at the end oftrans the trajectory
-    origin_pos = cycle_data.pos(:, end);
+    % s(n).Data: [pos_x; pos_y; vel_x; vel_y]
+    s(n).Data = [cycle_data.pos; cycle_data.vel];
+    s(n).nbData = nbData;
     
-    % Store the transformation matrix for this frame
-    % This represents the position of the new frame's origin w.r.t the world frame
-    frames(:, :, i) = [eye(2), origin_pos; 0 0 1];
+    % --- Define Frame 1 (index 200) ---
+    frame_index_1 = 200;
+    origin_pos_1 = cycle_data.pos(:, frame_index_1);
+    final_orientation_1 = cycle_data.orientation(frame_index_1);
+    R1 = [cos(final_orientation_1), -sin(final_orientation_1);
+          sin(final_orientation_1),  cos(final_orientation_1)];
+    s(n).p(1).b = origin_pos_1; % Translation vector
+    s(n).p(1).A = R1;           % Rotation matrix
     
-    % Transform the position data to be relative to the new origin
-    transformed_pos = cycle_data.pos - origin_pos;
-    
-    % Combine all data for the demonstration.
-    % Velocity, acceleration, and orientation are properties of the motion
-    % itself and do not change with a simple translation of the coordinate system.
-    demos{i} = [transformed_pos; 
-                cycle_data.vel; 
-                cycle_data.acc;
-                cycle_data.orientation;
-                cycle_data.orientation_vel;
-                cycle_data.orientation_acc];
+    % --- Define Frame 2 (index 160) ---
+    frame_index_2 = 160;
+    origin_pos_2 = cycle_data.pos(:, frame_index_2);
+    final_orientation_2 = cycle_data.orientation(frame_index_2);
+    R2 = [cos(final_orientation_2), -sin(final_orientation_2);
+          sin(final_orientation_2),  cos(final_orientation_2)];
+    s(n).p(2).b = origin_pos_2;
+    s(n).p(2).A = R2;
 end
 
 %% Save Data for TP-GMM
-fprintf('Saving data for TP-GMM...\n');
-save('Gait Data/TPGMM_data.mat', 'demos', 'frames');
+fprintf('\nSaving TP-GMM compatible data s to Gait Data/TPGMM_data.mat...\n');
+save('Gait Data/TPGMM_data.mat', 's', 'nbSamples');
 
 fprintf('TP-GMM data processing complete.\n');
 
-%% Plot the TP-GMM data
-plot_TPGMM_data(demos, frames, linear_kinematics_pose);
+%% Plotting section
+plot_TPGMM_s_data(s, nbSamples);
 
-%% Plot the results for the first gait cycle
 plot_kinematics_with_orientation(linear_kinematics_pose);
+
+% plot_TPGMM_data(demos, frames, linear_kinematics_pose);

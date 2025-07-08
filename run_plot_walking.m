@@ -11,7 +11,7 @@ asf_file = 'AMC/39.asf';
 amc_file = 'AMC/39_01.amc';
 
 % Call the plotting function
-plot_root_and_ankles_trajectory(asf_file, amc_file);
+plot_root_and_ankles_trajectory(asf_file, amc_file, true)
 
 
 % R_lfemur = eul2rotm(deg2rad([90,0,0]), 'XYZ')                      

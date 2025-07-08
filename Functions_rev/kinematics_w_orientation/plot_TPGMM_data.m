@@ -46,7 +46,7 @@ function plot_TPGMM_data(demos, frames, original_kinematics)
 
     % --- Add Orientation Arrows for the first trajectory ---
     num_points = size(original_traj_1, 2);
-    num_arrows = round(num_points * 0.1);
+    num_arrows = round(num_points * 0.9);
     indices = round(linspace(1, num_points, num_arrows));
     arrow_scale = 0.3; % Adjust this value to change arrow length
 
@@ -56,7 +56,7 @@ function plot_TPGMM_data(demos, frames, original_kinematics)
     orient_orig = original_kin_1.orientation(indices);
     u_orig = cos(orient_orig);
     v_orig = sin(orient_orig);
-    quiver(x_orig, y_orig, u_orig, v_orig, arrow_scale, 'Color', 'm', 'LineWidth', 1, 'DisplayName', 'Original Orientation');
+    quiver(x_orig, y_orig, u_orig, v_orig, arrow_scale, 'Color', 'c', 'LineWidth', 1, 'DisplayName', 'Original Orientation');
 
     % Arrows for the first transformed trajectory
     x_trans = transformed_traj_1(1, indices);

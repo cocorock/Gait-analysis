@@ -15,10 +15,11 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
     root_rot = D(:, 4:6);
 
     % Get joint angles
-    lfemur_rot = D(:, 56); %56:58
-    ltibia_rot = D(:, 59);
-    rfemur_rot = D(:, 49); %49:51
-    rtibia_rot = D(:, 52);
+    lfemur_rot = -D(:, 56); %Flexion/Extesion  %56:58
+    rfemur_rot = -D(:, 49); %Flexion/Extesion  %49:51
+    
+    ltibia_rot = -D(:, 59);   %Flexion/Extesion 
+    rtibia_rot = -D(:, 52);   %Flexion/Extesion 
 
     % Initialize position matrices
     left_knee_pos = zeros(size(root_pos));
@@ -28,10 +29,10 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
 
     for i = 1:size(D, 1)
         % Get root position and rotation for the current frame
-        hip_pos = root_pos(i, :);
+        hip_pos = root_pos(i, :) * [1 0 0; 0 1 0; 0 0 1];
         rx = root_rot(i, 1);
-        ry = root_rot(i, 2);
-        rz = root_rot(i, 3);
+        ry = 0;%root_rot(i, 2);
+        rz = 0;%root_rot(i, 3);
 
         % Create rotation matrices
         R_x = [1, 0, 0; 0, cosd(rx), -sind(rx); 0, sind(rx), cosd(rx)];
@@ -44,11 +45,11 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
         rotated_left_hip_offset = R * left_hip_offset;
         left_hip_pos = hip_pos + rotated_left_hip_offset';
 
-        knee_vec_l = bone_lengths.lfemur * [0, -cosd(lfemur_rot(i, 2)), sind(lfemur_rot(i, 2))]';
+        knee_vec_l = bone_lengths.lfemur * [0, -cosd(lfemur_rot(i)), sind(lfemur_rot(i))]';
         rotated_knee_vec_l = R * knee_vec_l;
         left_knee_pos(i, :) = left_hip_pos + rotated_knee_vec_l';
 
-        ankle_vec_l = bone_lengths.ltibia * [0, -cosd(lfemur_rot(i, 2) + ltibia_rot(i, 2)), sind(lfemur_rot(i, 2) + ltibia_rot(i, 2))]';
+        ankle_vec_l = bone_lengths.ltibia * [0, -cosd(lfemur_rot(i) + ltibia_rot(i)), sind(lfemur_rot(i) + ltibia_rot(i))]';
         rotated_ankle_vec_l = R * ankle_vec_l;
         left_ankle_pos(i, :) = left_knee_pos(i, :) + rotated_ankle_vec_l';
 
@@ -57,11 +58,11 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
         rotated_right_hip_offset = R * right_hip_offset;
         right_hip_pos = hip_pos + rotated_right_hip_offset';
 
-        knee_vec_r = bone_lengths.rfemur * [0, -cosd(rfemur_rot(i, 2)), sind(rfemur_rot(i, 2))]';
+        knee_vec_r = bone_lengths.rfemur * [0, -cosd(rfemur_rot(i)), sind(rfemur_rot(i))]';
         rotated_knee_vec_r = R * knee_vec_r;
         right_knee_pos(i, :) = right_hip_pos + rotated_knee_vec_r';
 
-        ankle_vec_r = bone_lengths.rtibia * [0, -cosd(rfemur_rot(i, 2) + rtibia_rot(i, 2)), sind(rfemur_rot(i, 2) + rtibia_rot(i, 2))]';
+        ankle_vec_r = bone_lengths.rtibia * [0, -cosd(rfemur_rot(i) + rtibia_rot(i)), sind(rfemur_rot(i) + rtibia_rot(i))]';
         rotated_ankle_vec_r = R * ankle_vec_r;
         right_ankle_pos(i, :) = right_knee_pos(i, :) + rotated_ankle_vec_r';
     end

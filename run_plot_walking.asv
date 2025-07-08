@@ -5,10 +5,9 @@ close all;
 % Add necessary paths to access functions and data
 addpath('./AMC/');
 addpath('./Functions_rev/'); % Use the revised functions
-
 % Define file paths
-asf_file = 'AMC/39.asf';
-amc_file = 'AMC/39_01.amc';
+asf_file = 'AMC/02.asf';
+amc_file = 'AMC/02_01.amc';
 
 % Call the plotting function
 plot_root_and_ankles_trajectory(asf_file, amc_file);
@@ -16,4 +15,4 @@ plot_root_and_ankles_trajectory(asf_file, amc_file);
 
 % R_lfemur = eul2rotm(deg2rad([90,0,0]), 'XYZ')                      
 
-% extract_hip_knee_flexion(amc_file);
+extract_hip_knee_flexion(amc_file)

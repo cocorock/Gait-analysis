@@ -15,10 +15,10 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
     root_rot = D(:, 4:6);
 
     % Get joint angles
-    lfemur_rot = D(:, 31:33);
-    ltibia_rot = D(:, 34:36);
-    rfemur_rot = D(:, 46:48);
-    rtibia_rot = D(:, 49:51);
+    lfemur_rot = D(:, 56); %56:58
+    ltibia_rot = D(:, 59);
+    rfemur_rot = D(:, 49); %49:51
+    rtibia_rot = D(:, 52);
 
     % Initialize position matrices
     left_knee_pos = zeros(size(root_pos));

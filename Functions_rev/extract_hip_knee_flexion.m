@@ -92,7 +92,9 @@ function [time, right_hip_flex, left_hip_flex, right_knee_flex, left_knee_flex] 
         error('No valid frame data found in file');
     end
     
-    hip_offset_angle = -20;
+%     disp(frame_data)
+    
+    hip_offset_angle = -0;
     % Extract data
     frames = frame_data(:, 1);
     right_hip_flex = -frame_data(:, 2)+hip_offset_angle;  % Flip hip flexion/extension
@@ -104,7 +106,7 @@ function [time, right_hip_flex, left_hip_flex, right_knee_flex, left_knee_flex] 
     fps = 120;
     time = (frames - frames(1)) / fps;
 
-% % %     Plot the results
+% %     Plot the results
 %     figure('Position', [100, 100, 1200, 800]);
 % 
 %     %Hip flexion/extension

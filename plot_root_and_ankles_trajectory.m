@@ -17,7 +17,6 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
     % Get joint angles
     lfemur_rot = -D(:, 56); %Flexion/Extesion  %56:58
     rfemur_rot = -D(:, 49); %Flexion/Extesion  %49:51
-    
     ltibia_rot = -D(:, 59);   %Flexion/Extesion 
     rtibia_rot = -D(:, 52);   %Flexion/Extesion 
 
@@ -26,6 +25,8 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
     right_knee_pos = zeros(size(root_pos));
     left_ankle_pos = zeros(size(root_pos));
     right_ankle_pos = zeros(size(root_pos));
+    left_hip_pos_all = zeros(size(root_pos));
+    right_hip_pos_all = zeros(size(root_pos));
 
     for i = 1:size(D, 1)
         % Get root position and rotation for the current frame
@@ -44,6 +45,7 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
         left_hip_offset = [-bone_lengths.lhipjoint, 0, 0]';
         rotated_left_hip_offset = R * left_hip_offset;
         left_hip_pos = hip_pos + rotated_left_hip_offset';
+        left_hip_pos_all(i, :) = left_hip_pos;
 
         knee_vec_l = bone_lengths.lfemur * [0, -cosd(lfemur_rot(i)), sind(lfemur_rot(i))]';
         rotated_knee_vec_l = R * knee_vec_l;
@@ -57,6 +59,7 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
         right_hip_offset = [bone_lengths.rhipjoint, 0, 0]';
         rotated_right_hip_offset = R * right_hip_offset;
         right_hip_pos = hip_pos + rotated_right_hip_offset';
+        right_hip_pos_all(i, :) = right_hip_pos;
 
         knee_vec_r = bone_lengths.rfemur * [0, -cosd(rfemur_rot(i)), sind(rfemur_rot(i))]';
         rotated_knee_vec_r = R * knee_vec_r;
@@ -67,22 +70,9 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
         right_ankle_pos(i, :) = right_knee_pos(i, :) + rotated_ankle_vec_r';
     end
 
-    % Rotate all data 90 degrees around the X-axis and 90 degrees in Z-axis
-%     root_pos = rotate_data_xyz(root_pos, 90, 0, 90);
-%     left_knee_pos = rotate_data_xyz(left_knee_pos, 90, 0, 90);
-%     right_knee_pos = rotate_data_xyz(right_knee_pos, 90, 0, 90);
-%     left_ankle_pos = rotate_data_xyz(left_ankle_pos, 90, 0, 90);
-%     right_ankle_pos = rotate_data_xyz(right_ankle_pos, 90, 0, 90);
-
     % Create time vector (frame numbers)
-    frames = 1:size(D, 1);
-
-    % Apply final transformation to align with desired coordinate system (X: Mediolateral, Y: Vertical, Z: Progression)
-%     root_pos = [root_pos(:,1), root_pos(:,3), -root_pos(:,2)];
-%     left_knee_pos = [left_knee_pos(:,1), left_knee_pos(:,3), -left_knee_pos(:,2)];
-%     right_knee_pos = [right_knee_pos(:,1), right_knee_pos(:,3), -right_knee_pos(:,2)];
-%     left_ankle_pos = [left_ankle_pos(:,1), left_ankle_pos(:,3), -left_ankle_pos(:,2)];
-%     right_ankle_pos = [right_ankle_pos(:,1), right_ankle_pos(:,3), -right_ankle_pos(:,2)];
+    frames = 0:1/120:size(D,1)/120; % 1:size(D, 1);
+    frames = frames(1:end-1)';
 
     % Create figure with subplots
     figure('Position', [100, 100, 1200, 800]);
@@ -104,7 +94,7 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
     plot(frames, right_knee_pos(:,1), 'b:', 'LineWidth', 1.5);
     plot(frames, right_knee_pos(:,2), 'b:', 'LineWidth', 1.5);
     plot(frames, right_knee_pos(:,3), 'b:', 'LineWidth', 1.5);
-    xlabel('Frame');
+    xlabel('Time');
     ylabel('Position (m)');
     title('Position Over Time');
     legend('Root X', 'Root Y', 'Root Z', 'L Ankle X', 'L Ankle Y', 'L Ankle Z', 'R Ankle X', 'R Ankle Y', 'R Ankle Z', 'L Knee X', 'L Knee Y', 'L Knee Z', 'R Knee X', 'R Knee Y', 'R Knee Z', 'Location', 'best');
@@ -115,7 +105,7 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
     plot(frames, root_rot(:,1), 'r-', 'LineWidth', 1.5); hold on;
     plot(frames, root_rot(:,2), 'g-', 'LineWidth', 1.5);
     plot(frames, root_rot(:,3), 'b-', 'LineWidth', 1.5);
-    xlabel('Frame');
+    xlabel('Time');
     ylabel('Rotation (degrees)');
     title('Root Rotation Over Time');
     legend('RX', 'RY', 'RZ', 'Location', 'best');
@@ -192,6 +182,18 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
     plot3(right_knee_pos(:,1), right_knee_pos(:,3), right_knee_pos(:,2), 'b:', 'LineWidth', 2);
     plot3(root_pos(1,1), root_pos(1,3), root_pos(1,2), 'ko', 'MarkerSize', 10, 'MarkerFaceColor', 'g'); % Start
     plot3(root_pos(end,1), root_pos(end,3), root_pos(end,2), 'ko', 'MarkerSize', 10, 'MarkerFaceColor', 'r'); % End
+    
+    inter_space=24;
+    % Draw lines for limbs every 12 frames
+    for i = 1:inter_space:size(D, 1)
+        % Left leg
+        line([left_hip_pos_all(i,1), left_knee_pos(i,1)], [left_hip_pos_all(i,3), left_knee_pos(i,3)], [left_hip_pos_all(i,2), left_knee_pos(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+        line([left_knee_pos(i,1), left_ankle_pos(i,1)], [left_knee_pos(i,3), left_ankle_pos(i,3)], [left_knee_pos(i,2), left_ankle_pos(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+        % Right leg
+        line([right_hip_pos_all(i,1), right_knee_pos(i,1)], [right_hip_pos_all(i,3), right_knee_pos(i,3)], [right_hip_pos_all(i,2), right_knee_pos(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+        line([right_knee_pos(i,1), right_ankle_pos(i,1)], [right_knee_pos(i,3), right_ankle_pos(i,3)], [right_knee_pos(i,2), right_ankle_pos(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+    end
+
     xlabel('Mediolateral (X) Position (m)');
     ylabel('Progression (Z) Position (m)');
     zlabel('Height (Y) Position (m)');
@@ -208,6 +210,92 @@ function plot_root_and_ankles_trajectory(asf_file, amc_file)
     plot(right_ankle_pos(:,3), right_ankle_pos(:,2), 'b-', 'LineWidth', 1.5);
     plot(left_knee_pos(:,3), left_knee_pos(:,2), 'r:', 'LineWidth', 1.5);
     plot(right_knee_pos(:,3), right_knee_pos(:,2), 'b:', 'LineWidth', 1.5);
+
+    % Draw lines for limbs every 12 frames
+    for i = 1:inter_space:size(D, 1)
+        % Left leg
+        line([left_hip_pos_all(i,3), left_knee_pos(i,3)], [left_hip_pos_all(i,2), left_knee_pos(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+        line([left_knee_pos(i,3), left_ankle_pos(i,3)], [left_knee_pos(i,2), left_ankle_pos(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+        % Right leg
+        line([right_hip_pos_all(i,3), right_knee_pos(i,3)], [right_hip_pos_all(i,2), right_knee_pos(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+        line([right_knee_pos(i,3), right_ankle_pos(i,3)], [right_knee_pos(i,2), right_ankle_pos(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+    end
+
+    xlabel('Progression (Z) Position (m)');
+    ylabel('Height (Y) Position (m)');
+    title('Ankle and Knee Trajectories (Sagittal View)');
+    legend('Root', 'Left Ankle', 'Right Ankle', 'Left Knee', 'Right Knee', 'Location', 'best');
+    grid on;
+    axis equal;
+    
+    
+    %% second frame of reference (hip)
+        % Initialize position matrices
+    left_knee_pos_FR2 = zeros(size(root_pos));
+    right_knee_pos_FR2 = zeros(size(root_pos));
+    left_ankle_pos_FR2 = zeros(size(root_pos));
+    right_ankle_pos_FR2 = zeros(size(root_pos));
+    left_hip_pos_all_FR2 = zeros(size(root_pos));
+    right_hip_pos_all_FR2 = zeros(size(root_pos));
+
+    for i = 1:size(D, 1)
+        % Get root position and rotation for the current frame
+        hip_pos = 0; %root_pos(i, :) * [1 0 0; 0 1 0; 0 0 1];
+        rx = 0; root_rot(i, 1);
+        ry = 0;%root_rot(i, 2);
+        rz = 0;%root_rot(i, 3);
+
+        % Create rotation matrices
+        R_x = [1, 0, 0; 0, cosd(rx), -sind(rx); 0, sind(rx), cosd(rx)];
+        R_y = [cosd(ry), 0, sind(ry); 0, 1, 0; -sind(ry), 0, cosd(ry)];
+        R_z = [cosd(rz), -sind(rz), 0; sind(rz), cosd(rz), 0; 0, 0, 1];
+        R = R_z * R_y * R_x; % Combined rotation matrix
+
+        % Left leg kinematics
+        left_hip_offset = [-bone_lengths.lhipjoint, 0, 0]';
+        rotated_left_hip_offset = R * left_hip_offset;
+        left_hip_pos = hip_pos + rotated_left_hip_offset';
+        left_hip_pos_all_FR2(i, :) = left_hip_pos;
+
+        knee_vec_l = bone_lengths.lfemur * [0, -cosd(lfemur_rot(i)), sind(lfemur_rot(i))]';
+        rotated_knee_vec_l = R * knee_vec_l;
+        left_knee_pos_FR2(i, :) = left_hip_pos + rotated_knee_vec_l';
+
+        ankle_vec_l = bone_lengths.ltibia * [0, -cosd(lfemur_rot(i) + ltibia_rot(i)), sind(lfemur_rot(i) + ltibia_rot(i))]';
+        rotated_ankle_vec_l = R * ankle_vec_l;
+        left_ankle_pos_FR2(i, :) = left_knee_pos_FR2(i, :) + rotated_ankle_vec_l';
+
+        % Right leg kinematics
+        right_hip_offset = [bone_lengths.rhipjoint, 0, 0]';
+        rotated_right_hip_offset = R * right_hip_offset;
+        right_hip_pos = hip_pos + rotated_right_hip_offset';
+        right_hip_pos_all_FR2(i, :) = right_hip_pos;
+
+        knee_vec_r = bone_lengths.rfemur * [0, -cosd(rfemur_rot(i)), sind(rfemur_rot(i))]';
+        rotated_knee_vec_r = R * knee_vec_I r;
+        right_knee_pos_FR2(i, :) = right_hip_pos + rotated_knee_vec_r';
+
+        ankle_vec_r = bone_lengths.rtibia * [0, -cosd(rfemur_rot(i) + rtibia_rot(i)), sind(rfemur_rot(i) + rtibia_rot(i))]';
+        rotated_ankle_vec_r = R * ankle_vec_r;
+        right_ankle_pos_FR2(i, :) = right_knee_pos_FR2(i, :) + rotated_ankle_vec_r';
+    end
+    
+    % 4th figure for sagittal view of ankles and knees
+    figure();
+    hold on;
+    plot(left_ankle_pos_FR2(:,3), left_ankle_pos_FR2(:,2), 'r-', 'LineWidth', 1.5);
+    plot(right_ankle_pos_FR2(:,3), right_ankle_pos_FR2(:,2), 'b-', 'LineWidth', 1.5);
+
+    % Draw lines for limbs every 12 frames
+    for i = 1:inter_space:size(D, 1)
+        % Left leg
+        line([left_hip_pos_all_FR2(i,3), left_knee_pos_FR2(i,3)], [left_hip_pos_all_FR2(i,2), left_knee_pos_FR2(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+        line([left_knee_pos_FR2(i,3), left_ankle_pos_FR2(i,3)], [left_knee_pos_FR2(i,2), left_ankle_pos_FR2(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+        % Right leg
+        line([right_hip_pos_all_FR2(i,3), right_knee_pos_FR2(i,3)], [right_hip_pos_all_FR2(i,2), right_knee_pos_FR2(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+        line([right_knee_pos_FR2(i,3), right_ankle_pos_FR2(i,3)], [right_knee_pos_FR2(i,2), right_ankle_pos_FR2(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+    end
+
     xlabel('Progression (Z) Position (m)');
     ylabel('Height (Y) Position (m)');
     title('Ankle and Knee Trajectories (Sagittal View)');

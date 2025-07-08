@@ -282,11 +282,11 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
 
             u = cos(left_ankle_orientation(i)  );
             v = sin(left_ankle_orientation(i)  );
-            quiver(left_ankle_pos(i,3), left_ankle_pos(i,2), u, v, 0.1, 'm', 'HandleVisibility', 'off');
+            quiver(left_ankle_pos(i,3), left_ankle_pos(i,2), u, v, 0.1, 'r', 'HandleVisibility', 'off');
 
             u = cos(right_ankle_orientation(i)  );
             v = sin(right_ankle_orientation(i)  );
-            quiver(right_ankle_pos(i,3), right_ankle_pos(i,2), u, v, 0.1, 'c', 'HandleVisibility', 'off');
+            quiver(right_ankle_pos(i,3), right_ankle_pos(i,2), u, v, 0.1, 'b', 'HandleVisibility', 'off');
         end
 
         xlabel('Progression (Z) Position (m)');
@@ -307,13 +307,13 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
             line([right_hip_pos_all_FR2(i,3), right_knee_pos_FR2(i,3)], [right_hip_pos_all_FR2(i,2), right_knee_pos_FR2(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
             line([right_knee_pos_FR2(i,3), right_ankle_pos_FR2(i,3)], [right_knee_pos_FR2(i,2), right_ankle_pos_FR2(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
 
-            u = cos(left_ankle_orientation_FR2(i)  );
-            v = sin(left_ankle_orientation_FR2(i)  );
-            quiver(left_ankle_pos_FR2(i,3), left_ankle_pos_FR2(i,2), u, v, 0.1, 'm', 'HandleVisibility', 'off');
+            u = cos(left_ankle_orientation_FR2(i) + pi/2);
+            v = sin(left_ankle_orientation_FR2(i) + pi/2);
+            quiver(left_ankle_pos_FR2(i,3), left_ankle_pos_FR2(i,2), u, v, 0.1, 'r', 'HandleVisibility', 'off');
 
-            u = cos(right_ankle_orientation_FR2(i)  );
-            v = sin(right_ankle_orientation_FR2(i)  );
-            quiver(right_ankle_pos_FR2(i,3), right_ankle_pos_FR2(i,2), u, v, 0.1, 'c', 'HandleVisibility', 'off');
+            u = cos(right_ankle_orientation_FR2(i) + pi/2);
+            v = sin(right_ankle_orientation_FR2(i) + pi/2);
+            quiver(right_ankle_pos_FR2(i,3), right_ankle_pos_FR2(i,2), u, v, 0.1, 'b', 'HandleVisibility', 'off');
         end
 
         xlabel('Progression (Z) Position (m)');

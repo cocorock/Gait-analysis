@@ -13,7 +13,9 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
 
     % Read motion data from AMC file
     D = amc_to_matrix(amc_file);
-
+    frames = 0:1/120:size(D,1)/120; 
+    frames = frames(1:end-1)';
+    
     % Extract root position and rotation
     root_pos = D(:, 1:3) * 1/0.45 * 25.4 / 1000; % Scale to meters
     root_rot = D(:, 4:6);
@@ -136,8 +138,8 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
     right_ankle_orientation_FR2 = right_tibia_angle_FR2 + pi/2;
 
     if plot_figures
-        frames = 0:1/120:size(D,1)/120; 
-        frames = frames(1:end-1)';
+        
+        inter_space = 12;
 
         figure('Position', [100, 100, 1200, 800]);
 
@@ -181,6 +183,7 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         plot(right_knee_pos(:,1), right_knee_pos(:,3), 'b:', 'LineWidth', 1.5);
         plot(root_pos(1,1), root_pos(1,3), 'ko', 'MarkerSize', 8, 'MarkerFaceColor', 'g'); 
         plot(root_pos(end,1), root_pos(end,3), 'ko', 'MarkerSize', 8, 'MarkerFaceColor', 'r');
+        
         xlabel('Mediolateral (X) Position (m)');
         ylabel('Progression (Z) Position (m)');
         title('Trajectory (Top View / Transverse)');
@@ -194,6 +197,10 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         plot(right_ankle_pos(:,3), right_ankle_pos(:,2), 'b-', 'LineWidth', 1.5);
         plot(left_knee_pos(:,3), left_knee_pos(:,2), 'r:', 'LineWidth', 1.5);
         plot(right_knee_pos(:,3), right_knee_pos(:,2), 'b:', 'LineWidth', 1.5);
+        for i = 1:inter_space:size(D, 1)
+            rx = deg2rad(root_rot(i, 1));
+            quiver(root_pos(i,3), root_pos(i,2), cos(rx), sin(rx), 0.1, 'k', 'HandleVisibility', 'off');
+        end
         xlabel('Progression (Z) Position (m)');
         ylabel('Height (Y) Position (m)');
         title('Trajectory (Side View / Sagittal)');
@@ -207,6 +214,7 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         plot(right_ankle_pos(:,1), right_ankle_pos(:,2), 'b-', 'LineWidth', 1.5);
         plot(left_knee_pos(:,1), left_knee_pos(:,2), 'r:', 'LineWidth', 1.5);
         plot(right_knee_pos(:,1), right_knee_pos(:,2), 'b:', 'LineWidth', 1.5);
+        
         xlabel('Mediolateral (X) Position (m)');
         ylabel('Height (Y) Position (m)');
         title('Trajectory (Front View / Frontal)');
@@ -220,6 +228,12 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         plot3(right_ankle_pos(:,1), right_ankle_pos(:,3), right_ankle_pos(:,2), 'b-', 'LineWidth', 2);
         plot3(left_knee_pos(:,1), left_knee_pos(:,3), left_knee_pos(:,2), 'r:', 'LineWidth', 2);
         plot3(right_knee_pos(:,1), right_knee_pos(:,3), right_knee_pos(:,2), 'b:', 'LineWidth', 2);
+        for i = 1:inter_space:size(D, 1)
+            u = 0;
+            v = cosd(root_rot(i, 1));
+            w = sind(root_rot(i, 1));
+            quiver3(root_pos(i,1), root_pos(i,3), root_pos(i,2), u, v, w, 0.2, 'k', 'HandleVisibility', 'off');
+        end
         xlabel('Mediolateral (X) Position (m)');
         ylabel('Progression (Z) Position (m)');
         zlabel('Height (Y) Position (m)');
@@ -231,7 +245,7 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
 
         sgtitle('Root, Knee, and Ankle Motion Analysis', 'FontSize', 16, 'FontWeight', 'bold');
 
-        figure();
+        figure();%2
         plot3(root_pos(:,1), root_pos(:,3), root_pos(:,2), 'k-', 'LineWidth', 2); hold on;
         plot3(left_ankle_pos(:,1), left_ankle_pos(:,3), left_ankle_pos(:,2), 'r-', 'LineWidth', 2);
         plot3(right_ankle_pos(:,1), right_ankle_pos(:,3), right_ankle_pos(:,2), 'b-', 'LineWidth', 2);
@@ -240,7 +254,6 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         plot3(root_pos(1,1), root_pos(1,3), root_pos(1,2), 'ko', 'MarkerSize', 10, 'MarkerFaceColor', 'g');
         plot3(root_pos(end,1), root_pos(end,3), root_pos(end,2), 'ko', 'MarkerSize', 10, 'MarkerFaceColor', 'r');
         
-        inter_space=24;
         for i = 1:inter_space:size(D, 1)
             line([left_hip_pos_all(i,1), left_knee_pos(i,1)], [left_hip_pos_all(i,3), left_knee_pos(i,3)], [left_hip_pos_all(i,2), left_knee_pos(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
             line([left_knee_pos(i,1), left_ankle_pos(i,1)], [left_knee_pos(i,3), left_ankle_pos(i,3)], [left_knee_pos(i,2), left_ankle_pos(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
@@ -256,6 +269,11 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
             v = cos(right_ankle_orientation(i) );
             w = sin(right_ankle_orientation(i) );
             quiver3(right_ankle_pos(i,1), right_ankle_pos(i,3), right_ankle_pos(i,2), u, v, w, 0.1, 'b', 'HandleVisibility', 'off');
+
+            u = 0;
+            v = cosd(root_rot(i, 1));
+            w = sind(root_rot(i, 1));
+            quiver3(root_pos(i,1), root_pos(i,3), root_pos(i,2), u, v, w, 0.2, 'k', 'HandleVisibility', 'off');
         end
 
         xlabel('Mediolateral (X) Position (m)');
@@ -267,7 +285,7 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         axis equal;
         view(3);
 
-        figure();
+        figure();%3
         plot(root_pos(:,3), root_pos(:,2), 'k-', 'LineWidth', 1.5); hold on;
         plot(left_ankle_pos(:,3), left_ankle_pos(:,2), 'r-', 'LineWidth', 1.5);
         plot(right_ankle_pos(:,3), right_ankle_pos(:,2), 'b-', 'LineWidth', 1.5);
@@ -287,6 +305,10 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
             u = cos(right_ankle_orientation(i)  );
             v = sin(right_ankle_orientation(i)  );
             quiver(right_ankle_pos(i,3), right_ankle_pos(i,2), u, v, 0.1, 'c', 'HandleVisibility', 'off');
+
+            v = cosd(root_rot(i, 1));
+            w = sind(root_rot(i, 1));
+            quiver(root_pos(i,3), root_pos(i,2), v, w, 0.1, 'm', 'HandleVisibility', 'off');
         end
 
         xlabel('Progression (Z) Position (m)');
@@ -296,7 +318,7 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         grid on;
         axis equal;
         
-        figure();
+        figure();%4
         hold on;
         plot(left_ankle_pos_FR2(:,3), left_ankle_pos_FR2(:,2), 'r-', 'LineWidth', 1.5);
         plot(right_ankle_pos_FR2(:,3), right_ankle_pos_FR2(:,2), 'b-', 'LineWidth', 1.5);
@@ -314,6 +336,10 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
             u = cos(right_ankle_orientation_FR2(i)  );
             v = sin(right_ankle_orientation_FR2(i)  );
             quiver(right_ankle_pos_FR2(i,3), right_ankle_pos_FR2(i,2), u, v, 0.1, 'c', 'HandleVisibility', 'off');
+            
+            v = cosd(root_rot(i, 1));
+            w = sind(root_rot(i, 1));
+            quiver(0,0, v, w, 0.1, 'm', 'HandleVisibility', 'off');
         end
 
         xlabel('Progression (Z) Position (m)');
@@ -324,6 +350,8 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         axis equal;
     end
 
+    trajectories.time = frames;
+    trajectories.pelvis_orientation = root_rot(:, 1);
     trajectories.left_ankle_pos = left_ankle_pos(:,[3,2]);
     trajectories.right_ankle_pos = right_ankle_pos(:,[3,2]);
     trajectories.left_ankle_pos_FR2 = left_ankle_pos_FR2(:,[3,2]);

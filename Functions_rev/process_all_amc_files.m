@@ -45,7 +45,7 @@ function [all_cycles_data, file_info] = process_all_amc_files(amc_files, show_de
         
         try
             % Extract gait cycles using robust method
-            gait_cycles_data =extract_gait_cycles_knee_minima_robust(filename, show_debug_plot, enable_printing); %<<-----
+            gait_cycles_data = extract_gait_cycles_knee_minima_robust(filename, show_debug_plot, enable_printing); %<<-----
 %             gait_cycles_data = extract_gait_cycles_knee_minima(filename);
 
             if isempty(gait_cycles_data)

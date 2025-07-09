@@ -3,7 +3,6 @@ clc;       % Clear the command window
 clear; % Clear all variables from the workspace
 
 % Add necessary paths to access functions and data
-addpath('./AMC2/');
 addpath('./Functions_rev/'); % Use the revised functions
 addpath('./Gait Data/');
 
@@ -25,7 +24,7 @@ for i = 1:length(amc_files)
     fprintf('Processing file %d of %d: %s with %s\n', i, length(amc_files), amc_file, asf_file);
     
     % Get the trajectories without plotting the figures
-    trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, false);
+    trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, true);
     
     % Store the trajectories in the cell array
     all_trajectories{i} = trajectories;

@@ -1,9 +1,8 @@
-
 % Functions_rev/detect_heel_strikes.m
 function heel_strike_indices = detect_heel_strikes(ankle_pos_FR2_trajectory, sample_rate)
     % DETECT_HEEL_STRIKES Detects robust heel strike events from ankle position trajectory
     %   in a specific frame of reference (FR2). Heel strike is identified as
-    %   the moment of largest change (peak in speed magnitude) in the trajectory.
+    %   the moment of largest change (peak in acceleration magnitude) in the trajectory.
     %
     %   Inputs:
     %     ankle_pos_FR2_trajectory: Nx2 matrix where N is the number of frames,
@@ -26,11 +25,10 @@ function heel_strike_indices = detect_heel_strikes(ankle_pos_FR2_trajectory, sam
     min_gait_duration = 0.75; % Minimum expected gait cycle duration (seconds)
     min_frames_between_cycles = round(min_gait_duration * sample_rate);
     
-    % Time step for velocity calculation
+    % Time step for velocity/acceleration calculation
     dt = 1 / sample_rate;
 
     % 1. Calculate velocity of the trajectory
-    % Assuming calculate_velocity function is available in the path
     velocity_trajectory = calculate_velocity(ankle_pos_FR2_trajectory, dt);
 
     % --- IMPORTANT: Remove the last element due to circular reference issue ---
@@ -38,21 +36,26 @@ function heel_strike_indices = detect_heel_strikes(ankle_pos_FR2_trajectory, sam
     % trajectory is not a perfect cycle.
     velocity_trajectory = velocity_trajectory(1:end-1, :);
 
-    % 2. Calculate the magnitude of the velocity (speed)
-    speed_magnitude = sqrt(sum(velocity_trajectory.^2, 2));
+    % 2. Calculate acceleration from velocity
+    acceleration_trajectory = calculate_velocity(velocity_trajectory, dt); % Re-using calculate_velocity for derivative
 
-    % 3. Smooth the speed magnitude
-    speed_smooth = smooth(speed_magnitude, window_size);
+    % --- IMPORTANT: Remove the last element due to circular reference issue (again for acceleration) ---
+    acceleration_trajectory = acceleration_trajectory(1:end-1, :);
 
-    % 4. Detect peaks in the smoothed speed magnitude
-    % Heel strike is often associated with a peak in speed or a sudden change.
-    % We are looking for the "largest change", which implies a peak in speed.
+    % 3. Calculate the magnitude of the acceleration
+    acceleration_magnitude = sqrt(sum(acceleration_trajectory.^2, 2));
+
+    % 4. Smooth the acceleration magnitude
+    acceleration_smooth = smooth(acceleration_magnitude, window_size);
+
+    % 5. Detect peaks in the smoothed acceleration magnitude
+    % Heel strike is often associated with a peak in acceleration.
     
     % Calculate prominence threshold based on data range
-    speed_range = max(speed_smooth) - min(speed_smooth);
-    min_prominence_threshold = speed_range * 0.10; % 10% of the speed range as minimum prominence
+    accel_range = max(acceleration_smooth) - min(acceleration_smooth);
+    min_prominence_threshold = accel_range * 0.10; % 10% of the acceleration range as minimum prominence
 
-    [pks, heel_strike_indices] = findpeaks(speed_smooth, ...
+    [pks, heel_strike_indices] = findpeaks(acceleration_smooth, ...
         'MinPeakDistance', min_frames_between_cycles, ...
         'MinPeakProminence', min_prominence_threshold);
 
@@ -71,37 +74,37 @@ function heel_strike_indices = detect_heel_strikes(ankle_pos_FR2_trajectory, sam
         ylabel('Y-position');
         grid on;
 
-        % Plot 2: Speed Magnitude
+        % Plot 2: Acceleration Magnitude
         subplot(3,1,2);
-        plot(speed_magnitude, 'k');
+        plot(acceleration_magnitude, 'k');
         hold on;
-        plot(speed_smooth, 'r', 'LineWidth', 1.5);
-        title('Speed Magnitude (Black: Original, Red: Smoothed)');
+        plot(acceleration_smooth, 'r', 'LineWidth', 1.5);
+        title('Acceleration Magnitude (Black: Original, Red: Smoothed)');
         xlabel('Frame');
-        ylabel('Speed');
+        ylabel('Acceleration');
         grid on;
-        legend('Original Speed', 'Smoothed Speed', 'Location', 'best');
+        legend('Original Acceleration', 'Smoothed Acceleration', 'Location', 'best');
 
-        % Plot 3: Smoothed Speed Magnitude with Detected Heel Strikes
+        % Plot 3: Smoothed Acceleration Magnitude with Detected Heel Strikes
         subplot(3,1,3);
-        plot(speed_smooth, 'r', 'LineWidth', 1.5);
+        plot(acceleration_smooth, 'r', 'LineWidth', 1.5);
         hold on;
         if ~isempty(heel_strike_indices)
-            plot(heel_strike_indices, speed_smooth(heel_strike_indices), 'go', 'MarkerSize', 8, 'MarkerFaceColor', 'g');
-            text(heel_strike_indices, speed_smooth(heel_strike_indices), num2str(heel_strike_indices), ...
+            plot(heel_strike_indices, acceleration_smooth(heel_strike_indices), 'go', 'MarkerSize', 8, 'MarkerFaceColor', 'g');
+            text(heel_strike_indices, acceleration_smooth(heel_strike_indices), num2str(heel_strike_indices), ...
                  'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right', 'Color', 'g');
         end
-        title(sprintf('Smoothed Speed Magnitude with Detected Heel Strikes (%d found)', length(heel_strike_indices)));
+        title(sprintf('Smoothed Acceleration Magnitude with Detected Heel Strikes (%d found)', length(heel_strike_indices)));
         xlabel('Frame');
-        ylabel('Speed');
+        ylabel('Acceleration');
         grid on;
         if ~isempty(heel_strike_indices)
-            legend('Smoothed Speed', 'Detected Heel Strikes', 'Location', 'best');
+            legend('Smoothed Acceleration', 'Detected Heel Strikes', 'Location', 'best');
         else
-            legend('Smoothed Speed', 'Location', 'best');
+            legend('Smoothed Acceleration', 'Location', 'best');
         end
         
         % Add a line for the prominence threshold
-        yline(min(speed_smooth) + min_prominence_threshold, ':', 'Prominence Threshold');
+        yline(min(acceleration_smooth) + min_prominence_threshold, ':', 'Prominence Threshold');
     end
 end

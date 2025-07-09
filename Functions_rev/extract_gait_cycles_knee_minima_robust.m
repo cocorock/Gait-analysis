@@ -31,7 +31,7 @@ function [gait_cycles_data] = extract_gait_cycles_knee_minima_robust(filename, s
     % Gait cycle parameters
     sample_rate = 120; % Hz
     avg_gait_duration = 1.0; % seconds
-    gait_tolerance = 0.25; % �0.25 seconds
+    gait_tolerance = 0.25; % 0.25 seconds
     min_gait_duration = avg_gait_duration - gait_tolerance; % 0.75s
     max_gait_duration = avg_gait_duration + gait_tolerance; % 1.25s
 

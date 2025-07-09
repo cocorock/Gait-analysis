@@ -6,7 +6,6 @@ clear;
 
 % Add necessary paths
 addpath('./Functions_rev/');
-addpath('./Gait Data/');
 
 % Load the all_trajectories data
 load('./Gait Data/all_trajectories.mat', 'all_trajectories');
@@ -26,17 +25,6 @@ for i = 1:length(all_trajectories)
     % 1. Detect heel strikes
     left_hs_indices = detect_heel_strikes(current_trajectory_struct.left_ankle_pos, sampling_freq);
     right_hs_indices = detect_heel_strikes(current_trajectory_struct.right_ankle_pos, sampling_freq);
-    
-    figure()
-    hold on
-    plot(current_trajectory_struct.time, current_trajectory_struct.left_ankle_pos(:,2), 'DisplayName', 'time-Y');
-%     plot(current_trajectory_struct.time, current_trajectory_struct.right_ankle_pos(:,2));
-    stem(current_trajectory_struct.time(left_hs_indices), current_trajectory_struct.left_ankle_pos(left_hs_indices,2), 'DisplayName', 'min time-Y');
-%     stem(current_trajectory_struct.time(right_hs_indices), current_trajectory_struct.right_ankle_pos(right_hs_indices,2));
-    plot(current_trajectory_struct.left_ankle_pos(:,1), current_trajectory_struct.left_ankle_pos(:,2), 'DisplayName', 'X-Y');
-    stem(current_trajectory_struct.left_ankle_pos(left_hs_indices), current_trajectory_struct.left_ankle_pos(left_hs_indices,2));
-    plot(current_trajectory_struct.time, current_trajectory_struct.left_ankle_pos(:,2));
-    grid on;
     
     % 2. Segment gait cycles
     % This function will return a cell array of structs, each representing a gait cycle

@@ -24,10 +24,10 @@ for i = 1:length(all_trajectories)
     current_trajectory_struct = all_trajectories{i};
 
     % 1. Detect heel strikes
-    left_hs_indices = detect_heel_strikes(current_trajectory_struct.left_ankle_pos, sampling_freq);
-    right_hs_indices = detect_heel_strikes(current_trajectory_struct.right_ankle_pos, sampling_freq);
-    
-    close all;
+    left_hs_indices = detect_heel_strikes(current_trajectory_struct.left_ankle_pos_FR2, sampling_freq);
+    right_hs_indices = detect_heel_strikes(current_trajectory_struct.right_ankle_pos_FR2, sampling_freq);
+
+	close all;
     figure()
     hold on
     plot(current_trajectory_struct.time, current_trajectory_struct.left_ankle_pos(:,2), 'DisplayName', 'time-Y');

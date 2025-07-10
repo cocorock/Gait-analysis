@@ -41,22 +41,11 @@ for i = 1:length(all_trajectories)
      if show_debug_plot
         figure(7);
         hold on
-%         plot(current_trajectory_struct.time, current_trajectory_struct.left_ankle_pos(:,2), 'DisplayName', 'time-Y');
-%         plot(current_trajectory_struct.time, current_trajectory_struct.right_ankle_pos(:,1), '.','DisplayName', 'time-X');
-%         stem(current_trajectory_struct.time(left_hs_indices), current_trajectory_struct.left_ankle_pos(left_hs_indices,2), 'DisplayName', 'min time-Y');
-%         stem(current_trajectory_struct.time(right_hs_indices), current_trajectory_struct.right_ankle_pos(right_hs_indices,1), 'DisplayName', 'min time-X');
+        stem(current_trajectory_struct.time(right_hs_indices), current_trajectory_struct.right_ankle_pos(right_hs_indices,1), 'DisplayName', 'min time-X');
         plot(current_trajectory_struct.left_ankle_pos(:,1), current_trajectory_struct.left_ankle_pos(:,2), '--', 'DisplayName', 'L X-Y');
         stem(current_trajectory_struct.left_ankle_pos(left_hs_indices,1), current_trajectory_struct.left_ankle_pos(left_hs_indices,2), '--', 'LineWidth', 2, 'DisplayName', 'L min X-Y');
-        
         plot(current_trajectory_struct.right_ankle_pos(:,1), current_trajectory_struct.right_ankle_pos(:,2)+0.3, '--' ,'DisplayName', 'L X-Y');
         stem(current_trajectory_struct.right_ankle_pos(right_hs_indices,1), current_trajectory_struct.right_ankle_pos(right_hs_indices,2)+0.3, '--', 'LineWidth', 2, 'DisplayName', 'L min X-Y');
-        
-        %FR2
-%         plot(current_trajectory_struct.left_ankle_pos_FR2(:,1), current_trajectory_struct.left_ankle_pos_FR2(:,2),  '--', 'DisplayName', 'FR2 X-Y');
-%         stem(current_trajectory_struct.left_ankle_pos_FR2(left_hs_indices,1), current_trajectory_struct.left_ankle_pos_FR2(left_hs_indices,2),  '--', 'DisplayName', 'min FR2 X-Y');
-%         plot(current_trajectory_struct.time, current_trajectory_struct.left_ankle_pos_FR2(:,2), 'DisplayName', 'FR2 time-Y');
-%         stem(current_trajectory_struct.time(left_hs_indices,1), current_trajectory_struct.left_ankle_pos_FR2(left_hs_indices,2), 'DisplayName', 'min FR2 time-Y');
-%         plot(current_trajectory_struct.time, current_trajectory_struct.left_ankle_pos_FR2(:,1), 'DisplayName', 'FR2 time-X');
         grid on;
         legend;
     end
@@ -80,28 +69,48 @@ for i = 1:length(all_trajectories)
             % Apply filtering to all fields
             filtered_data = apply_butterworth_filter(original_data, sampling_freq, cutoff_freq);
             
-            % Calculate velocity for specific fields
+            % Calculate velocity for specific fields, then resample it
             if contains(field, 'ankle_pos') || contains(field, 'ankle_pos_FR2')
                 velocity_data = calculate_velocity(filtered_data, dt);
-                processed_cycle_struct.([field '_velocity']) = velocity_data; % Store velocity
+                
+                if isfield(current_cycle_struct, 'time')
+                    % Create a time vector for the velocity data, which can be one point shorter
+                    time_for_velocity = current_cycle_struct.time(1:size(velocity_data, 1));
+                    resampled_velocity_data = resample_trajectory(velocity_data, time_for_velocity, target_resample_points);
+                    processed_cycle_struct.([field '_velocity']) = resampled_velocity_data; % Store resampled velocity
+                else
+                    warning('Time field not found. Storing non-resampled velocity for field %s.', field);
+                    processed_cycle_struct.([field '_velocity']) = velocity_data; % Store non-resampled velocity
+                end
             end
             
             % Resample all fields
             % Ensure 'time' field is used for resampling, and it exists
             if isfield(current_cycle_struct, 'time')
                 resampled_data = resample_trajectory(filtered_data, current_cycle_struct.time, target_resample_points);
+                
+                % If the current field is 'time', normalize it from 0 to 1
+                if strcmp(field, 'time')
+                    resampled_data = (resampled_data - min(resampled_data)) / (max(resampled_data) - min(resampled_data));
+                end
+                
                 processed_cycle_struct.(field) = resampled_data; % Store resampled data
             else
                 warning('Time field not found in current cycle struct. Skipping resampling for field %s.', field);
                 processed_cycle_struct.(field) = filtered_data; % Store filtered data if no time for resampling
             end
         end
+       
         processed_cycles{j} = processed_cycle_struct;
+        
     end
     processed_gait_data{i} = processed_cycles;
 end
 
 processed_gait_data = {processed_gait_data{1}{:} , processed_gait_data{2}{:}};
+for i=1:size(processed_gait_data,2)
+    processed_gait_data{i}.time = (0:199)/200;
+end
 % Save the processed data
 output_file = './Gait Data/new_processed_gait_data.mat';
 save(output_file, 'processed_gait_data');

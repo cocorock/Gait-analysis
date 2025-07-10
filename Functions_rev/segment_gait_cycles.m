@@ -26,11 +26,15 @@ function segmented_gait_cycles = segment_gait_cycles(trajectory_struct, left_hs_
         end_idx = left_hs_indices(i+1);
 
         current_cycle_struct = struct();
+        if isfield(trajectory_struct, 'time')
+            current_cycle_struct.time = trajectory_struct.time(start_idx:end_idx, :);
+        end
+
         for j = 1:length(field_names)
             field = field_names{j};
-            cycle_data = trajectory_struct.(field)(start_idx:end_idx, :);
             
             if contains(field, 'left', 'IgnoreCase', true) 
+                cycle_data = trajectory_struct.(field)(start_idx:end_idx, :);
                 % If the field seems to contain positional data (and not FR2), normalize it
                 % by subtracting the last (X,Y) position of the cycle.
                 if contains(field, 'pos', 'IgnoreCase', true) && ~contains(field, 'FR2', 'IgnoreCase', true) && size(cycle_data, 2) >= 2
@@ -38,7 +42,6 @@ function segmented_gait_cycles = segment_gait_cycles(trajectory_struct, left_hs_
                     cycle_data(:, 1:2) = cycle_data(:, 1:2) - last_pos_xy;
                 end
                 current_cycle_struct.(field(6:end)) = cycle_data;
-                disp('L---')
             end
         end
         
@@ -52,11 +55,15 @@ function segmented_gait_cycles = segment_gait_cycles(trajectory_struct, left_hs_
         end_idx = right_hs_indices(i+1);
 
         current_cycle_struct = struct();
+        if isfield(trajectory_struct, 'time')
+            current_cycle_struct.time = trajectory_struct.time(start_idx:end_idx, :);
+        end
+
         for j = 1:length(field_names)
             field = field_names{j};
-            cycle_data = trajectory_struct.(field)(start_idx:end_idx, :);
             
            if contains(field, 'right', 'IgnoreCase', true) 
+                cycle_data = trajectory_struct.(field)(start_idx:end_idx, :);
                 % If the field seems to contain positional data (and not FR2), normalize it
                 % by subtracting the last (X,Y) position of the cycle.
                 if contains(field, 'pos', 'IgnoreCase', true) && ~contains(field, 'FR2', 'IgnoreCase', true) && size(cycle_data, 2) >= 2
@@ -64,7 +71,6 @@ function segmented_gait_cycles = segment_gait_cycles(trajectory_struct, left_hs_
                     cycle_data(:, 1:2) = cycle_data(:, 1:2) - last_pos_xy;
                 end
                 current_cycle_struct.(field(7:end)) = cycle_data;
-                disp('R---')
             end
         end
         segmented_gait_cycles{end+1} = current_cycle_struct;

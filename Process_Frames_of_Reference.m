@@ -5,7 +5,7 @@ clear; % Clear all variables from the workspace
 % Add necessary paths to access functions and data
 addpath('./Functions_rev/'); % Use the revised functions
 addpath('./Gait Data/');
-
+addpath('./AMC2/');
 
 % Get all AMC files from the specified directory.
 amc_files = get_amc_files('AMC2/');

@@ -9,6 +9,7 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
 %   trajectories - struct containing trajectory and orientation data
 
     % Read bone lengths from ASF file
+    disp(asf_file)
     bone_lengths = read_asf_lengths(asf_file);
 
     % Read motion data from AMC file

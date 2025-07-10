@@ -15,6 +15,7 @@ load('Gait Data/processed_gait_data_fields_angular.mat');
 
 Data_structured = create_demos_structure_per_cycleV2(mat_data.processed_data);
 
+
 %% Parameters
 phi = -90; % Rotation angle in degrees
 %% Calculate Linear Kinematics with Orientation

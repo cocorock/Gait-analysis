@@ -1,5 +1,4 @@
 
-
 % Process_Gait_Data_Advanced.m
 close all;
 clc;
@@ -25,8 +24,8 @@ if false
     figure(6)
     hold on;
     for i=1:size(all_trajectories)
-        plot( all_trajectories{i}.left_ankle_pos(:,1) , all_trajectories{i}.left_ankle_pos(:,2));
-        plot( all_trajectories{i}.right_ankle_pos(:,1) , all_trajectories{i}.right_ankle_pos(:,2)+0.1);
+        plot( all_trajectories{i}.left_ankle_pos_FR1(:,1) , all_trajectories{i}.left_ankle_pos_FR1(:,2));
+        plot( all_trajectories{i}.right_ankle_pos_FR1(:,1) , all_trajectories{i}.right_ankle_pos_FR1(:,2)+0.1);
     end
 end
 
@@ -35,18 +34,18 @@ for i = 1:length(all_trajectories)
     current_trajectory_struct = all_trajectories{i};
 
     % 1. Detect heel strikes
-    left_hs_indices = detect_heel_strikes(current_trajectory_struct.left_ankle_pos_FR2, sampling_freq);
-    right_hs_indices = detect_heel_strikes(current_trajectory_struct.right_ankle_pos_FR2, sampling_freq);
+    left_hs_indices = detect_heel_strikes(current_trajectory_struct.left_ankle_pos_FR1, sampling_freq);
+    right_hs_indices = detect_heel_strikes(current_trajectory_struct.right_ankle_pos_FR1, sampling_freq);
     
      if show_debug_plot
         figure(17);
         hold on
-%         stem(current_trajectory_struct.time(right_hs_indices), current_trajectory_struct.right_ankle_pos(right_hs_indices,1), 'DisplayName', 'min time-X');
-        plot(current_trajectory_struct.left_ankle_pos(:,1), current_trajectory_struct.left_ankle_pos(:,2), '--', 'DisplayName', 'L X-Y');
-        stem(current_trajectory_struct.left_ankle_pos(left_hs_indices,1), current_trajectory_struct.left_ankle_pos(left_hs_indices,2), '--', 'LineWidth', 2, 'DisplayName', 'L min X-Y');
+%         stem(current_trajectory_struct.time(right_hs_indices), current_trajectory_struct.right_ankle_pos_FR1(right_hs_indices,1), 'DisplayName', 'min time-X');
+        plot(current_trajectory_struct.left_ankle_pos_FR2(:,1), current_trajectory_struct.left_ankle_pos_FR2(:,2), '--', 'DisplayName', 'L X-Y');
+        stem(current_trajectory_struct.left_ankle_pos_FR2(left_hs_indices,1), current_trajectory_struct.left_ankle_pos_FR2(left_hs_indices,2), '--', 'LineWidth', 2, 'DisplayName', 'L min X-Y');
         r = rand(1);
-        plot(current_trajectory_struct.right_ankle_pos(:,1), current_trajectory_struct.right_ankle_pos(:,2)+r, '--' ,'DisplayName', 'L X-Y');
-        stem(current_trajectory_struct.right_ankle_pos(right_hs_indices,1), current_trajectory_struct.right_ankle_pos(right_hs_indices,2)+r, '--', 'LineWidth', 2, 'DisplayName', 'L min X-Y');
+        plot(current_trajectory_struct.right_ankle_pos_FR2(:,1), current_trajectory_struct.right_ankle_pos_FR2(:,2)+r, '--' ,'DisplayName', 'L X-Y');
+        stem(current_trajectory_struct.right_ankle_pos_FR2(right_hs_indices,1), current_trajectory_struct.right_ankle_pos_FR2(right_hs_indices,2)+r, '--', 'LineWidth', 2, 'DisplayName', 'L min X-Y');
         grid on;
         legend;
     end
@@ -109,22 +108,30 @@ for i = 1:length(all_trajectories)
 end
 
 processed_gait_data = [processed_gait_data{1}(:)' , processed_gait_data{2}(:)'];
-for i=1:size(processed_gait_data,2)
+
+
+for i=1:size(processed_gait_data, 2)
+    %Normalize time
     processed_gait_data{i}.time = ((0:199)/200)';
+    % reshapre rotation Matrix A
+    processed_gait_data{i}.ankle_A_FR1 = reshape(processed_gait_data{i}.ankle_A_FR1, [200, 2, 2]);
+    processed_gait_data{i}.ankle_A_FR2 = reshape(processed_gait_data{i}.ankle_A_FR2, [200, 2, 2]);
 end
 
-processed_gait_data = set_lastPoint_FR1(processed_gait_data);
+% processed_gait_data = set_lastPoint_FR1(processed_gait_data);
 
 % % Save the processed data
-% output_file = './Gait Data/new_processed_gait_data.mat';
-% save(output_file, 'processed_gait_data');
-% 
-% fprintf('All gait data processed and saved to %s\n', output_file);
- fprintf('DATA NOT saved \n');
+output_file = './Gait Data/new_processed_gait_data.mat';
+save(output_file, 'processed_gait_data');
+
+fprintf('All gait data processed and saved to %s\n', output_file);
+%  fprintf('DATA NOT saved \n');
  
 % --- New Plotting Logic ---
 % Flag to enable/disable these plots
 show_new_plots = true;
+
+%%
 
 if show_new_plots
     % Create figure for phase space plots
@@ -205,6 +212,7 @@ if show_new_plots
     ylabel('Velocity (FR2)');
     grid on;
     
+    
     offs =0;
     % Loop through all processed gait data to plot
     for i = 1:length(processed_gait_data) % Loop through each original trajectory
@@ -217,13 +225,13 @@ if show_new_plots
 
             % Plot Ankle Positions (Original Frame)
             subplot(2, 2, 1);
-            plot(current_cycle.ankle_pos(:,1), current_cycle.ankle_pos(:,2)+offs, 'b-', 'DisplayName', sprintf('Ankle Pos (Cycle %d)', i));
-            plot(current_cycle.ankle_pos(1,1), current_cycle.ankle_pos(1,2)+offs, 'r+', 'MarkerSize', 10, 'HandleVisibility', 'off');
+            plot(current_cycle.ankle_pos_FR1(:,1), current_cycle.ankle_pos_FR1(:,2)+offs, 'b-', 'DisplayName', sprintf('Ankle Pos (Cycle %d)', i));
+            plot(current_cycle.ankle_pos_FR1(1,1), current_cycle.ankle_pos_FR1(1,2)+offs, 'r+', 'MarkerSize', 10, 'HandleVisibility', 'off');
             if isfield(current_cycle, 'ankle_orientation') && isfield(current_cycle, 'ankle_pos')
                 arrow_skip = 10;
                 arrow_length = 0.03;
-                x = current_cycle.ankle_pos(1:arrow_skip:end, 1);
-                y = current_cycle.ankle_pos(1:arrow_skip:end, 2);
+                x = current_cycle.ankle_pos_FR1(1:arrow_skip:end, 1);
+                y = current_cycle.ankle_pos_FR1(1:arrow_skip:end, 2);
                 theta = current_cycle.ankle_orientation(1:arrow_skip:end);
                 u = cos(theta) * arrow_length;
                 v = sin(theta) * arrow_length;
@@ -232,9 +240,9 @@ if show_new_plots
 
             % Plot Ankle Velocities (Original Frame)
             subplot(2, 2, 2);
-            if isfield(current_cycle, 'ankle_pos_velocity')
-                plot(current_cycle.ankle_pos_velocity(:,1), current_cycle.ankle_pos_velocity(:,2), 'b-', 'DisplayName', sprintf('Left Ankle Vel (Cycle %d)', i));
-                plot(current_cycle.ankle_pos_velocity(1,1), current_cycle.ankle_pos_velocity(1,2), 'r+', 'MarkerSize', 10, 'HandleVisibility', 'off');
+            if isfield(current_cycle, 'ankle_pos_FR1_velocity')
+                plot(current_cycle.ankle_pos_FR1_velocity(:,1), current_cycle.ankle_pos_FR1_velocity(:,2), 'b-', 'DisplayName', sprintf('Left Ankle Vel (Cycle %d)', i));
+                plot(current_cycle.ankle_pos_FR1_velocity(1,1), current_cycle.ankle_pos_FR1_velocity(1,2), 'r+', 'MarkerSize', 10, 'HandleVisibility', 'off');
             end
 
             % Plot Ankle Positions (FR2 Frame)
@@ -264,14 +272,14 @@ if show_new_plots
 
             % Plot Ankle Positions vs. Time (Original Frame)
             subplot(2, 2, 1);
-            plot(current_cycle.time, current_cycle.ankle_pos(:,1), 'b-', 'DisplayName', sprintf('X Pos (Cycle %d)', i));
-            plot(current_cycle.time, current_cycle.ankle_pos(:,2), 'r-', 'DisplayName', sprintf('Y Pos (Cycle %d)', i));
+            plot(current_cycle.time, current_cycle.ankle_pos_FR1(:,1), 'b-', 'DisplayName', sprintf('X Pos (Cycle %d)', i));
+            plot(current_cycle.time, current_cycle.ankle_pos_FR1(:,2), 'r-', 'DisplayName', sprintf('Y Pos (Cycle %d)', i));
 
             % Plot Ankle Velocities vs. Time (Original Frame)
             subplot(2, 2, 2);
-            if isfield(current_cycle, 'ankle_pos_velocity')
-                plot(current_cycle.time, current_cycle.ankle_pos_velocity(:,1), 'b-', 'DisplayName', sprintf('X Vel (Cycle %d)', i));
-                plot(current_cycle.time, current_cycle.ankle_pos_velocity(:,2), 'r-', 'DisplayName', sprintf('Y Vel (Cycle %d)', i));
+            if isfield(current_cycle, 'ankle_pos_FR2_velocity')
+                plot(current_cycle.time, current_cycle.ankle_pos_FR1_velocity(:,1), 'b-', 'DisplayName', sprintf('X Vel FR1 (Cycle %d)', i));
+                plot(current_cycle.time, current_cycle.ankle_pos_FR1_velocity(:,2), 'r-', 'DisplayName', sprintf('Y Vel FR1 (Cycle %d)', i));
             end
 
             % Plot Ankle Positions vs. Time (FR2 Frame)
@@ -285,7 +293,7 @@ if show_new_plots
                 plot(current_cycle.time, current_cycle.ankle_pos_FR2_velocity(:,1), 'b--', 'DisplayName', sprintf('X Vel FR2 (Cycle %d)', i));
                 plot(current_cycle.time, current_cycle.ankle_pos_FR2_velocity(:,2), 'r--', 'DisplayName', sprintf('Y Vel FR2 (Cycle %d)', i));
             end
-        end
+    end
     
     
     % Add legends to all subplots

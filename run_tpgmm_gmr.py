@@ -36,9 +36,9 @@ def load_gait_data(mat_file_path):
             time = trial_data['time'].flatten().astype(np.float64)
             
             # Frame 1 data
-            ankle_pos = trial_data['ankle_pos'].astype(np.float64)  # [200x2]
-            ankle_vel = trial_data['ankle_pos_velocity'].astype(np.float64)  # [200x2]
-            ankle_orient = trial_data['ankle_orientation'].flatten().astype(np.float64)  # [200x1]
+            ankle_pos = trial_data['ankle_pos_FR1'].astype(np.float64)  # [200x2]
+            ankle_vel = trial_data['ankle_pos_FR1_velocity'].astype(np.float64)  # [200x2]
+            ankle_orient = trial_data['ankle_orientation_FR1'].flatten().astype(np.float64)  # [200x1]
             
             # Frame 2 data  
             ankle_pos_fr2 = trial_data['ankle_pos_FR2'].astype(np.float64)  # [200x2]

@@ -24,57 +24,69 @@ function segmented_gait_cycles = segment_gait_cycles(trajectory_struct, left_hs_
     for i = 1:(length(left_hs_indices) - 1)
         start_idx = left_hs_indices(i);
         end_idx = left_hs_indices(i+1);
-        
         current_cycle_struct = struct();
         
-        if isfield(trajectory_struct, 'time')
-            current_cycle_struct.time = trajectory_struct.time(start_idx:end_idx, :);
-        end
-
         for j = 1:length(field_names)
-            field = field_names{j};
-            
+            field = field_names{j}; 
             if contains(field, 'left', 'IgnoreCase', true) 
                 cycle_data = trajectory_struct.(field)(start_idx:end_idx, :);
-                % If the field seems to contain positional data (and not FR2), normalize it
-                % by subtracting the last (X,Y) position of the cycle.
-                if contains(field, 'pos', 'IgnoreCase', true) && ~contains(field, 'FR2', 'IgnoreCase', true) && size(cycle_data, 2) >= 2
+                if  ~(contains(field, '_A_', 'IgnoreCase', true)||...
+                        contains(field, '_b_', 'IgnoreCase', true)) && ...
+                         contains(field, 'FR1', 'IgnoreCase', true)
                     last_pos_xy = cycle_data(end, :);
-                    cycle_data = cycle_data - last_pos_xy;
+                    cycle_data = cycle_data ;
                 end
                 current_cycle_struct.(field(6:end)) = cycle_data;
+            elseif ~contains(field, 'right', 'IgnoreCase', true) 
+                current_cycle_struct.(field) = trajectory_struct.(field)(start_idx:end_idx, :);
             end
+            
         end
-        
-        segmented_gait_cycles{end+1} = current_cycle_struct;
-        
+        segmented_gait_cycles{end+1} = current_cycle_struct;    
     end
 
     % Process right leg gait cycles
     for i = 1:(length(right_hs_indices) - 1)
         start_idx = right_hs_indices(i);
         end_idx = right_hs_indices(i+1);
-
         current_cycle_struct = struct();
-        if isfield(trajectory_struct, 'time')
-            current_cycle_struct.time = trajectory_struct.time(start_idx:end_idx, :);
-        end
+        
+%         if isfield(trajectory_struct, 'time')
+%             current_cycle_struct.time = trajectory_struct.time(start_idx:end_idx, :);
+%         end
 
         for j = 1:length(field_names)
-            field = field_names{j};
-            
-           if contains(field, 'right', 'IgnoreCase', true) 
+            field = field_names{j}; 
+            if contains(field, 'right', 'IgnoreCase', true) 
                 cycle_data = trajectory_struct.(field)(start_idx:end_idx, :);
-                % If the field seems to contain positional data (and not FR2), normalize it
-                % by subtracting the last (X,Y) position of the cycle.
-                if contains(field, 'pos', 'IgnoreCase', true) && ~contains(field, 'FR2', 'IgnoreCase', true) && size(cycle_data, 2) >= 2
+                if  ~(contains(field, '_A_', 'IgnoreCase', true)||...
+                        contains(field, '_b_', 'IgnoreCase', true)) && ...
+                         contains(field, 'FR1', 'IgnoreCase', true)
                     last_pos_xy = cycle_data(end, :);
-                    cycle_data = cycle_data - last_pos_xy;
+                    cycle_data = cycle_data ;
                 end
                 current_cycle_struct.(field(7:end)) = cycle_data;
+            elseif ~contains(field, 'right', 'IgnoreCase', true) 
+                current_cycle_struct.(field) = trajectory_struct.(field)(start_idx:end_idx, :);
             end
+            
         end
-        segmented_gait_cycles{end+1} = current_cycle_struct;
-%         disp(size(segmented_gait_cycles))
+        segmented_gait_cycles{end+1} = current_cycle_struct;   
     end
 end
+
+
+                % If the field seems to contain positional data (and not FR2), normalize it
+                % by subtracting the last (X,Y) position of the cycle.
+%                 if contains(field, 'pos', 'IgnoreCase', true) && ~contains(field, 'FR2', 'IgnoreCase', true) && size(cycle_data, 2) >= 2
+%                     last_pos_xy = cycle_data(end, :);
+%                     cycle_data = cycle_data - last_pos_xy;
+%                 end
+
+
+                % If the field seems to contain positional data (and not FR2), normalize it
+                % by subtracting the last (X,Y) position of the cycle.
+%                 if contains(field, 'pos', 'IgnoreCase', true) && ~contains(field, 'FR2', 'IgnoreCase', true) && size(cycle_data, 2) >= 2
+%                     last_pos_xy = cycle_data(end, :);
+%                     cycle_data = cycle_data - last_pos_xy;
+%                 end

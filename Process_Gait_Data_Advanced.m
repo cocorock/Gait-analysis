@@ -8,8 +8,11 @@ clear;
 addpath('./Functions_rev/');
 addpath('./Gait Data/');
 
+subject = '39';
+filename = sprintf('./Gait Data/all_trajectories_ALL-10#%s.mat', subject);
+
 % Load the all_trajectories data
-load('./Gait Data/all_trajectories.mat', 'all_trajectories');
+load(filename, 'all_trajectories');
 
 % Define parameters
 sampling_freq = 120; % Hz
@@ -121,7 +124,7 @@ end
 % processed_gait_data = set_lastPoint_FR1(processed_gait_data);
 
 % % Save the processed data
-output_file = './Gait Data/new_processed_gait_data.mat';
+output_file = sprintf('./Gait Data/new_processed_gait_data#%s.mat', subject);
 save(output_file, 'processed_gait_data');
 
 fprintf('All gait data processed and saved to %s\n', output_file);

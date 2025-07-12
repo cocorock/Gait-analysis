@@ -1,10 +1,11 @@
-function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot_figures)
+function trajectories = plot_root_and_ankles_trajectoryFIXED(asf_file, amc_file, plot_figures, plot_figures2)
 % Plots the trajectory of the root, knees, and ankles.
 % Calculates and plots the ankle orientation.
 % Inputs:
 %   asf_file - path to the .asf file
 %   amc_file - path to the .amc file
 %   plot_figures - flag to plot figures or not
+%   plot_figures2 - flag to plot new kinds of plots
 % Outputs:
 %   trajectories - struct containing trajectory and orientation data
 
@@ -39,11 +40,12 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
     right_hip_pos_all = zeros(size(root_pos));
 
     ankle_A_FR1 = zeros( size(D, 1), 2, 2);
-    ankle_b_FR1 = zeros( size(D, 1), 2);
+    left_ankle_b_FR1 = zeros(size(D, 1), 2);
+    right_ankle_b_FR1 = zeros(size(D, 1), 2);
 
     for i = 1:size(D, 1)
         % Get root position and rotation for the current frame
-        hip_pos = 0; %root_pos(i, :) * [1 0 0; 0 1 0; 0 0 1];
+        hip_pos = 0; %root_pos(i, :) * [0 0 0; 0 1 0; 0 0 0];
         rx = root_rot(i, 1);
         ry = 0;%root_rot(i, 2);
         rz = 0;%root_rot(i, 3);
@@ -58,9 +60,6 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         A_hip = [cosd(rx), -sind(rx); sind(rx), cosd(rx)];
         ankle_A_FR1(i,:,:) = A_hip;
         
-        b_hip = [0, 0];  % Zero translation
-        ankle_b_FR1(i, :) = b_hip;
-        
         % Left leg kinematics
         left_hip_offset = [-bone_lengths.lhipjoint, 0, 0]';
         rotated_left_hip_offset = R * left_hip_offset;
@@ -74,6 +73,8 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         ankle_vec_l = bone_lengths.ltibia * [0, -cosd(lfemur_rot(i) + ltibia_rot(i)), sind(lfemur_rot(i) + ltibia_rot(i))]';
         rotated_ankle_vec_l = R * ankle_vec_l;
         left_ankle_pos(i, :) = left_knee_pos(i, :) + rotated_ankle_vec_l';
+        
+        left_ankle_b_FR1(i, :) =  left_hip_pos([3, 2]); ; %Z-Y
 
         % Right leg kinematics
         right_hip_offset = [bone_lengths.rhipjoint, 0, 0]';
@@ -88,12 +89,15 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         ankle_vec_r = bone_lengths.rtibia * [0, -cosd(rfemur_rot(i) + rtibia_rot(i)), sind(rfemur_rot(i) + rtibia_rot(i))]';
         rotated_ankle_vec_r = R * ankle_vec_r;
         right_ankle_pos(i, :) = right_knee_pos(i, :) + rotated_ankle_vec_r';
+        
+        right_ankle_b_FR1(i, :) =    right_hip_pos([3, 2]); %Z-Y
     end
 
 %     left_ankle_pos = left_ankle_pos - left_ankle_pos(end, :);
 %     right_ankle_pos = right_ankle_pos - right_ankle_pos(end, :);
     
-    %% second frame of reference (hip)
+    %% ===============   second frame of reference (hip)    ===============
+    
     left_knee_pos_FR2 = zeros(size(root_pos));
     right_knee_pos_FR2 = zeros(size(root_pos));
     left_ankle_pos_FR2 = zeros(size(root_pos));
@@ -102,7 +106,8 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
     right_hip_pos_all_FR2 = zeros(size(root_pos));
     
     ankle_A_FR2 = zeros( size(D, 1), 2, 2);
-    ankle_b_FR2 = zeros( size(D, 1), 2);
+    left_ankle_b_FR2 = zeros(size(D, 1), 2);
+    right_ankle_b_FR2 = zeros(size(D, 1), 2);
     
     for i = 1:size(D, 1)
         hip_pos = root_pos(i, :);
@@ -117,14 +122,13 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         
         A_hip = [cosd(rx), -sind(rx); sind(rx), cosd(rx)];
         ankle_A_FR2(i, :, :) = A_hip;
-        
-        b_hip = [root_pos(i, 3), root_pos(i, 2)];  %  translation
-        ankle_b_FR2(i, :) = b_hip;
 
         left_hip_offset = [-bone_lengths.lhipjoint, 0, 0]';
         rotated_left_hip_offset = R * left_hip_offset;
         left_hip_pos = hip_pos + rotated_left_hip_offset';
         left_hip_pos_all_FR2(i, :) = left_hip_pos;
+        
+        left_ankle_b_FR2(i, :) =  left_hip_pos([3, 2]);%Z-Y [ 0, hip_pos(2)] 
 
         knee_vec_l = bone_lengths.lfemur * [0, -cosd(lfemur_rot(i)), sind(lfemur_rot(i))]';
         rotated_knee_vec_l = R * knee_vec_l;
@@ -138,6 +142,8 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         rotated_right_hip_offset = R * right_hip_offset;
         right_hip_pos = hip_pos + rotated_right_hip_offset';
         right_hip_pos_all_FR2(i, :) = right_hip_pos;
+        
+        right_ankle_b_FR2(i, :) =  right_hip_pos([3, 2]);%Z-Y
 
         knee_vec_r = bone_lengths.rfemur * [0, -cosd(rfemur_rot(i)), sind(rfemur_rot(i))]';
         rotated_knee_vec_r = R * knee_vec_r;
@@ -179,9 +185,11 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
     trajectories.right_ankle_orientation_FR2 = right_ankle_orientation_FR2;
     
     trajectories.ankle_A_FR1 = ankle_A_FR1;
-    trajectories.ankle_b_FR1 = ankle_b_FR1;
+    trajectories.left_ankle_b_FR1 = left_ankle_b_FR1;
+    trajectories.right_ankle_b_FR1 = right_ankle_b_FR1;
     trajectories.ankle_A_FR2 = ankle_A_FR2;
-    trajectories.ankle_b_FR2 = ankle_b_FR2;
+    trajectories.left_ankle_b_FR2 = left_ankle_b_FR2;
+    trajectories.right_ankle_b_FR2 = right_ankle_b_FR2;
 
     
     %% Plotting
@@ -192,7 +200,7 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         figure('Position', [100, 100, 1200, 800]);
 
         subplot(2, 3, 1);
-        plot(frames, root_pos(I :,1), 'k-', 'LineWidth', 1.5); hold on;
+        plot(frames, root_pos(:,1), 'k-', 'LineWidth', 1.5); hold on;
         plot(frames, root_pos(:,2), 'k-', 'LineWidth', 1.5);
         plot(frames, root_pos(:,3), 'k-', 'LineWidth', 1.5);
         plot(frames, left_ankle_pos_FR2(:,1), 'r-', 'LineWidth', 1);
@@ -397,6 +405,134 @@ function trajectories = plot_root_and_ankles_trajectory(asf_file, amc_file, plot
         grid on;
         axis equal;
     end
+%%
+    if plot_figures2
+        figure('Position', [100, 100, 1800, 600]);
+        inter_space = 15; % Subsample for quiver plots
 
+        % Subplot 1: FR1 Trajectories with Orientation
+        subplot(1, 3, 1);
+        hold on;
+        plot(trajectories.left_ankle_pos_FR1(:,1), trajectories.left_ankle_pos_FR1(:,2), 'r-', 'LineWidth', 1.5, 'DisplayName', 'Left Ankle FR1');
+        plot(trajectories.right_ankle_pos_FR1(:,1), trajectories.right_ankle_pos_FR1(:,2), 'b-', 'LineWidth', 1.5, 'DisplayName', 'Right Ankle FR1');
+        
+        % Add orientation vectors using quiver
+        for i = 1:inter_space:size(D, 1)
+            % Left ankle orientation
+            u_l = cos(trajectories.left_ankle_orientation_FR1(i));
+            v_l = sin(trajectories.left_ankle_orientation_FR1(i));
+            quiver(trajectories.left_ankle_pos_FR1(i,1), trajectories.left_ankle_pos_FR1(i,2), u_l, v_l, 0.1, 'r', 'HandleVisibility', 'off');
+
+            % Right ankle orientation
+            u_r = cos(trajectories.right_ankle_orientation_FR1(i));
+            v_r = sin(trajectories.right_ankle_orientation_FR1(i));
+            quiver(trajectories.right_ankle_pos_FR1(i,1), trajectories.right_ankle_pos_FR1(i,2), u_r, v_r, 0.1, 'b', 'HandleVisibility', 'off');
+        end
+        
+        title('FR1 Ankle Trajectories with Orientation');
+        xlabel('Progression (Z) Position (m)');
+        ylabel('Height (Y) Position (m)');
+        legend('show');
+        grid on;
+        axis equal;
+
+        % Subplot 2: FR2 Trajectories with Orientation
+        subplot(1, 3, 2);
+        hold on;
+        plot(trajectories.left_ankle_pos_FR2(:,1), trajectories.left_ankle_pos_FR2(:,2), 'r-', 'LineWidth', 1.5, 'DisplayName', 'Left Ankle FR2');
+        plot(trajectories.right_ankle_pos_FR2(:,1), trajectories.right_ankle_pos_FR2(:,2), 'b-', 'LineWidth', 1.5, 'DisplayName', 'Right Ankle FR2');
+        
+        % Add orientation vectors for FR2
+        for i = 1:inter_space:size(D, 1)
+            % Left ankle orientation
+            u_l = cos(trajectories.left_ankle_orientation_FR2(i));
+            v_l = sin(trajectories.left_ankle_orientation_FR2(i));
+            quiver(trajectories.left_ankle_pos_FR2(i,1), trajectories.left_ankle_pos_FR2(i,2), u_l, v_l, 0.1, 'r', 'HandleVisibility', 'off');
+
+            % Right ankle orientation
+            u_r = cos(trajectories.right_ankle_orientation_FR2(i));
+            v_r = sin(trajectories.right_ankle_orientation_FR2(i));
+            quiver(trajectories.right_ankle_pos_FR2(i,1), trajectories.right_ankle_pos_FR2(i,2), u_r, v_r, 0.1, 'b', 'HandleVisibility', 'off');
+        end
+
+        title('FR2 Ankle Trajectories with Orientation');
+        xlabel('Progression (Z) Position (m)');
+        ylabel('Height (Y) Position (m)');
+        legend('show');
+        grid on;
+        axis equal;
+
+        % Subplot 3: Inverse Transformed Trajectories with Orientation
+        subplot(1, 3, 3);
+        hold on;
+        
+        % Pre-allocate arrays for inverse transformed data
+        left_ankle_inv_FR1 = zeros(size(trajectories.left_ankle_pos_FR1));
+        right_ankle_inv_FR1 = zeros(size(trajectories.right_ankle_pos_FR1));
+        left_ankle_inv_FR2 = zeros(size(trajectories.left_ankle_pos_FR2));
+        right_ankle_inv_FR2 = zeros(size(trajectories.right_ankle_pos_FR2));
+
+        left_orient_inv_FR1 = zeros(size(trajectories.left_ankle_pos_FR1));
+        right_orient_inv_FR1 = zeros(size(trajectories.right_ankle_pos_FR1));
+        left_orient_inv_FR2 = zeros(size(trajectories.left_ankle_pos_FR2));
+        right_orient_inv_FR2 = zeros(size(trajectories.right_ankle_pos_FR2));
+
+        for i = 1:size(D, 1)
+            % FR1 Inverse Transform (Position)
+            A_fr1 = squeeze(trajectories.ankle_A_FR1(i, :, :));
+            b_l_fr1 = trajectories.left_ankle_b_FR1(i, :)'; 
+            b_r_fr1 = trajectories.right_ankle_b_FR1(i, :)'; 
+            y_l_fr1 = trajectories.left_ankle_pos_FR1(i, :)';
+            y_r_fr1 = trajectories.right_ankle_pos_FR1(i, :)';
+            left_ankle_inv_FR1(i, :) = (A_fr1' * (y_l_fr1 - b_l_fr1))';
+            right_ankle_inv_FR1(i, :) = (A_fr1' * (y_r_fr1 - b_r_fr1))';
+
+            % FR1 Inverse Transform (Orientation)
+            orient_l_fr1 = [cos(trajectories.left_ankle_orientation_FR1(i)); sin(trajectories.left_ankle_orientation_FR1(i))];
+            orient_r_fr1 = [cos(trajectories.right_ankle_orientation_FR1(i)); sin(trajectories.right_ankle_orientation_FR1(i))];
+            left_orient_inv_FR1(i, :) = (A_fr1' * orient_l_fr1)';
+            right_orient_inv_FR1(i, :) = (A_fr1' * orient_r_fr1)';
+
+            % FR2 Inverse Transform (Position)
+            A_fr2 = squeeze(trajectories.ankle_A_FR2(i, :, :));
+            b_l_fr2 = trajectories.left_ankle_b_FR2(i, :)';
+            b_r_fr2 = trajectories.right_ankle_b_FR2(i, :)';
+            y_l_fr2 = trajectories.left_ankle_pos_FR2(i, :)';
+            y_r_fr2 = trajectories.right_ankle_pos_FR2(i, :)';
+            left_ankle_inv_FR2(i, :) = (A_fr2' * (y_l_fr2 - b_l_fr2))';
+            right_ankle_inv_FR2(i, :) = (A_fr2' * (y_r_fr2 - b_r_fr2))';
+
+            % FR2 Inverse Transform (Orientation)
+            orient_l_fr2 = [cos(trajectories.left_ankle_orientation_FR2(i)); sin(trajectories.left_ankle_orientation_FR2(i))];
+            orient_r_fr2 = [cos(trajectories.right_ankle_orientation_FR2(i)); sin(trajectories.right_ankle_orientation_FR2(i))];
+            left_orient_inv_FR2(i, :) = (A_fr2' * orient_l_fr2)';
+            right_orient_inv_FR2(i, :) = (A_fr2' * orient_r_fr2)';
+        end
+
+        plot(left_ankle_inv_FR1(:,1), left_ankle_inv_FR1(:,2), 'r--', 'LineWidth', 1.5, 'DisplayName', 'Left Ankle Inv FR1');
+        plot(right_ankle_inv_FR1(:,1), right_ankle_inv_FR1(:,2), 'b--', 'LineWidth', 1.5, 'DisplayName', 'Right Ankle Inv FR1');
+        plot(left_ankle_inv_FR2(:,1), left_ankle_inv_FR2(:,2), 'm-', 'LineWidth', 1.5, 'DisplayName', 'Left Ankle Inv FR2');
+        plot(right_ankle_inv_FR2(:,1), right_ankle_inv_FR2(:,2), 'c-', 'LineWidth', 1.5, 'DisplayName', 'Right Ankle Inv FR2');
+        
+        % Add inverse transformed orientation vectors using quiver
+        for i = 1:inter_space:size(D, 1)
+            % FR1 inverse orientation
+            quiver(left_ankle_inv_FR1(i,1), left_ankle_inv_FR1(i,2), left_orient_inv_FR1(i,1), left_orient_inv_FR1(i,2), 0.1, 'r', 'LineStyle', '--', 'HandleVisibility', 'off');
+            quiver(right_ankle_inv_FR1(i,1), right_ankle_inv_FR1(i,2), right_orient_inv_FR1(i,1), right_orient_inv_FR1(i,2), 0.1, 'b', 'LineStyle', '--', 'HandleVisibility', 'off');
+
+            % FR2 inverse orientation
+            quiver(left_ankle_inv_FR2(i,1), left_ankle_inv_FR2(i,2), left_orient_inv_FR2(i,1), left_orient_inv_FR2(i,2), 0.1, 'm', 'HandleVisibility', 'off');
+            quiver(right_ankle_inv_FR2(i,1), right_ankle_inv_FR2(i,2), right_orient_inv_FR2(i,1), right_orient_inv_FR2(i,2), 0.1, 'c', 'HandleVisibility', 'off');
+        end
+
+        title('Inverse Transformed Trajectories with Orientation');
+        xlabel('Local X Position (m)');
+        ylabel('Local Y Position (m)');
+        legend('show');
+        grid on;
+        axis equal;
+        
+        sgtitle('Advanced Kinematic Analysis', 'FontSize', 16, 'FontWeight', 'bold');
+    end
    
 end

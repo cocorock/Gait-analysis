@@ -45,7 +45,7 @@ end
     save(output_file, 'all_trajectories');
   else
       % Define the output file path
-    output_file = sprintf('./Gait Data/all_trajectories_ALL#%s.mat', amc_file(1:2));
+    output_file = sprintf('./Gait Data/all_trajectories#%s.mat', amc_file(1:2));
 
     % Save the collected trajectories
     save(output_file, 'all_trajectories');

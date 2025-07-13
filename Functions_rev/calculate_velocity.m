@@ -21,14 +21,17 @@ function velocity = calculate_velocity(position_data, dt)
     num_samples = size(position_data, 1);
     num_dimensions = size(position_data, 2);
     velocity = zeros(num_samples, num_dimensions);
-
+%     fprintf('velocity %d,%d  dt: %2.4f\n', num_samples, num_dimensions, dt);
     for i = 1:num_samples
-        if i == num_samples
-            % Circular reference for the last element: (pos(1) - pos(N)) / dt
-            velocity(i, :) = (position_data(1, :) - position_data(num_samples, :)) / dt;
-        else
-            % Standard forward difference: (pos(i+1) - pos(i)) / dt
+        if i == 1
+            % Forward difference for first element
             velocity(i, :) = (position_data(i+1, :) - position_data(i, :)) / dt;
+        elseif i == num_samples
+            % Backward difference for last element
+            velocity(i, :) = (position_data(i, :) - position_data(i-1, :)) / dt;
+        else
+            % Central difference for interior points
+            velocity(i, :) = (position_data(i+1, :) - position_data(i-1, :)) / (2*dt);
         end
     end
 end

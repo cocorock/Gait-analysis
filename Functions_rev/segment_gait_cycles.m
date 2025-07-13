@@ -30,15 +30,15 @@ function segmented_gait_cycles = segment_gait_cycles(trajectory_struct, left_hs_
             field = field_names{j}; 
             if contains(field, 'left', 'IgnoreCase', true) 
                 cycle_data = trajectory_struct.(field)(start_idx:end_idx, :);
-                if  ~(contains(field, '_A_', 'IgnoreCase', true)||...
-                        contains(field, '_b_', 'IgnoreCase', true)) && ...
-                         contains(field, 'FR1', 'IgnoreCase', true)
-                    last_pos_xy = cycle_data(end, :);
-                    cycle_data = cycle_data ;
+%                Calculates the last point in the trajectory ansd stores it
+                if contains(field, 'pos_FR2', 'IgnoreCase', true) %left_ankle_pos_FR1, left_ankle_pos_FR2
+                    last_pos_xy = cycle_data(end, :);                
+                    current_cycle_struct.RefPoint = last_pos_xy;
                 end
-                current_cycle_struct.(field(6:end)) = cycle_data;
-            elseif ~contains(field, 'right', 'IgnoreCase', true) 
-                current_cycle_struct.(field) = trajectory_struct.(field)(start_idx:end_idx, :);
+                
+                current_cycle_struct.(field(6:end)) = cycle_data; % left charaters cutted
+            elseif ~contains(field, 'right', 'IgnoreCase', true) %ankle_A_FR1 , ankle_A_FR2  and pelvis_orient
+                current_cycle_struct.(field) = trajectory_struct.(field)(start_idx:end_idx, :); % time
             end
             
         end
@@ -51,26 +51,22 @@ function segmented_gait_cycles = segment_gait_cycles(trajectory_struct, left_hs_
         end_idx = right_hs_indices(i+1);
         current_cycle_struct = struct();
         
-%         if isfield(trajectory_struct, 'time')
-%             current_cycle_struct.time = trajectory_struct.time(start_idx:end_idx, :);
-%         end
-
         for j = 1:length(field_names)
             field = field_names{j}; 
             if contains(field, 'right', 'IgnoreCase', true) 
                 cycle_data = trajectory_struct.(field)(start_idx:end_idx, :);
-                if  ~(contains(field, '_A_', 'IgnoreCase', true)||...
-                        contains(field, '_b_', 'IgnoreCase', true)) && ...
-                         contains(field, 'FR1', 'IgnoreCase', true)
-                    last_pos_xy = cycle_data(end, :);
-                    cycle_data = cycle_data ;
+%                Calculates the last point in the trajectory ansd stores it
+                if contains(field, 'pos_FR2', 'IgnoreCase', true) %left_ankle_pos_FR1, left_ankle_pos_FR2
+                    last_pos_xy = cycle_data(end, :);                
+                    current_cycle_struct.RefPoint = last_pos_xy;
                 end
-                current_cycle_struct.(field(7:end)) = cycle_data;
-            elseif ~contains(field, 'right', 'IgnoreCase', true) 
-                current_cycle_struct.(field) = trajectory_struct.(field)(start_idx:end_idx, :);
+                
+                current_cycle_struct.(field(7:end)) = cycle_data; % RIGHT charaters cutted
+            elseif ~contains(field, 'left', 'IgnoreCase', true) %ankle_A_FR1 , ankle_A_FR2  and pelvis_orient
+                current_cycle_struct.(field) = trajectory_struct.(field)(start_idx:end_idx, :); % time, 
             end
             
-        end
+        end        
         segmented_gait_cycles{end+1} = current_cycle_struct;   
     end
 end

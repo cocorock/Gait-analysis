@@ -1,4 +1,4 @@
-function trajectories = plot_root_and_ankles_trajectoryFIXED(asf_file, amc_file, plot_figures, plot_figures2)
+function trajectories = plot_root_and_ankles_trajectoryFIXED(asf_file, amc_file, angle_flag_plot, plot_figures, plot_figures2)
 % Plots the trajectory of the root, knees, and ankles.
 % Calculates and plots the ankle orientation.
 % Inputs:
@@ -12,7 +12,7 @@ function trajectories = plot_root_and_ankles_trajectoryFIXED(asf_file, amc_file,
     % Read bone lengths from ASF file
     disp(asf_file)
     bone_lengths = read_asf_lengths(asf_file);
-%     disp(bone_lengths)
+     disp(bone_lengths)
     
     % Read motion data from AMC file
     D = amc_to_matrix(amc_file);
@@ -29,6 +29,22 @@ function trajectories = plot_root_and_ankles_trajectoryFIXED(asf_file, amc_file,
     ltibia_rot = -D(:, 59);   %Flexion/Extesion 
     rtibia_rot = -D(:, 52);   %Flexion/Extesion 
 
+    if angle_flag_plot
+       figure(58)
+       hold on
+       subplot(2, 2, 1);
+       plot(lfemur_rot)
+        hold on
+       subplot(2, 2, 2);
+       plot(rfemur_rot)
+        hold on
+       subplot(2, 2, 3);
+       plot(ltibia_rot)
+        hold on
+       subplot(2, 2, 4);
+       plot(rtibia_rot)
+        hold on
+    end
     % Initialize position matrices
     % Fist frame, last point of the trajectory at the heel
     % strike
@@ -46,6 +62,7 @@ function trajectories = plot_root_and_ankles_trajectoryFIXED(asf_file, amc_file,
     for i = 1:size(D, 1)
         % Get root position and rotation for the current frame
         hip_pos = 0; %root_pos(i, :) * [0 0 0; 0 1 0; 0 0 0];
+        
         rx = root_rot(i, 1);
         ry = 0;%root_rot(i, 2);
         rz = 0;%root_rot(i, 3);

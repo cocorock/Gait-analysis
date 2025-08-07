@@ -24,5 +24,5 @@ end
 
 
 
-a_format_filename = sprintf('Gait Data/demo_gait_data_angular_%s_samples.mat', string(10));
-save(a_format_filename, 'output_struct_array');
+% a_format_filename = sprintf('Gait Data/demo_gait_data_angular_%s_samples.mat', string(10));
+% save(a_format_filename, 'output_struct_array');

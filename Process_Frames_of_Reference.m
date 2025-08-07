@@ -1,6 +1,7 @@
 % close all; % Close all existing figures
 clc;       % Clear the command window
 clear; % Clear all variables from the workspace
+close all;
 
 % Add necessary paths to access functions and data
 addpath('./Functions_rev/'); % Use the revised functions
@@ -24,7 +25,7 @@ for i = 1:length(amc_files)
     fprintf('Processing file %d of %d: %s with %s\n', i, length(amc_files), amc_file, asf_file);
     
     % Get the trajectories without plotting the figures
-    trajectories = plot_root_and_ankles_trajectoryFIXED(asf_file, amc_file, true, false, false);
+    trajectories = plot_root_and_ankles_trajectoryFIXED(asf_file, amc_file, false, true, true);
     
     % Store the trajectories in the cell array
     all_trajectories{i} = trajectories;
@@ -38,13 +39,13 @@ for i=1:size(amc_files,1)
 end
 % 
   if ~flag10  
-    Define the output file path
+%     Define the output file path
     output_file = sprintf('./Gait Data/all_trajectories_ALL-10#%s.mat', amc_file(1:2));
 
-    Save the collected trajectories
+%     Save the collected trajectories
     save(output_file, 'all_trajectories');
   else
-      Define the output file path
+%       Define the output file path
     output_file = sprintf('./Gait Data/all_trajectories_ALL#%s.mat', amc_file(1:2));
 
     Save the collected trajectories

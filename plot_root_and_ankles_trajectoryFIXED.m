@@ -63,7 +63,7 @@ function trajectories = plot_root_and_ankles_trajectoryFIXED(asf_file, amc_file,
         % Get root position and rotation for the current frame
         hip_pos = 0; %root_pos(i, :) * [0 0 0; 0 1 0; 0 0 0];
         
-        rx = root_rot(i, 1);
+        rx = 0;
         ry = 0;%root_rot(i, 2);
         rz = 0;%root_rot(i, 3);
         

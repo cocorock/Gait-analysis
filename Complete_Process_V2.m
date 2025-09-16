@@ -10,7 +10,7 @@ clear;
 addpath('./AMC/');
 addpath('./Functions_rev/'); % Use the revised functions
 addpath('./Gait Data/');
-
+addpath('./Functions_rev/Version2_4D/')
 %% Create Output Directories
 % This function creates the necessary output directories for saving plots and data
 
@@ -24,7 +24,7 @@ fprintf('\n=== Process Plot and Save All AMC Files Completed V2 ===\n');
 % Get all AMC files from the specified directory.
 amc_files = get_amc_files();
 % Process all AMC files to extract and collect gait cycle data.
-[all_cycles_data, file_info] = process_all_amc_files_v2(amc_files, false, false);
+[all_cycles_data, file_info] = process_all_amc_files_v2(amc_files, true, true);
 
 % Apply filtering to the collected gait data and calculate derivatives.
 processed_data = apply_filtering_and_derivatives_v2(all_cycles_data);

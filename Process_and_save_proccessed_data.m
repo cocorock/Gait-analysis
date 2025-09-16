@@ -22,7 +22,7 @@ fprintf('=== Gait Analysis v5 Started ===\n');
 amc_files = get_amc_files();
 
 % Process all AMC files to extract and collect gait cycle data.
-[all_cycles_data, file_info] = process_all_amc_files(amc_files, false, false);
+[all_cycles_data, file_info] = process_all_amc_files(amc_files, true, true);
 
 % Apply filtering to the collected gait data and calculate derivatives.
 processed_data = apply_filtering_and_derivatives(all_cycles_data);

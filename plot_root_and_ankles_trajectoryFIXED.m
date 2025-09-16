@@ -328,10 +328,10 @@ function trajectories = plot_root_and_ankles_trajectoryFIXED(asf_file, amc_file,
         plot3(root_pos(end,1), root_pos(end,3), root_pos(end,2), 'ko', 'MarkerSize', 10, 'MarkerFaceColor', 'r');
         
         for i = 1:inter_space:size(D, 1)
-            line([left_hip_pos_all_FR2(i,1), left_knee_pos_FR2(i,1)], [left_hip_pos_all_FR2(i,3), left_knee_pos_FR2(i,3)], [left_hip_pos_all_FR2(i,2), left_knee_pos_FR2(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
-            line([left_knee_pos_FR2(i,1), left_ankle_pos_FR2(i,1)], [left_knee_pos_FR2(i,3), left_ankle_pos_FR2(i,3)], [left_knee_pos_FR2(i,2), left_ankle_pos_FR2(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
-            line([right_hip_pos_all_FR2(i,1), right_knee_pos_FR2(i,1)], [right_hip_pos_all_FR2(i,3), right_knee_pos_FR2(i,3)], [right_hip_pos_all_FR2(i,2), right_knee_pos_FR2(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
-            line([right_knee_pos_FR2(i,1), right_ankle_pos_FR2(i,1)], [right_knee_pos_FR2(i,3), right_ankle_pos_FR2(i,3)], [right_knee_pos_FR2(i,2), right_ankle_pos_FR2(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+            line([left_hip_pos_all_FR2(i,1), left_knee_pos_FR2(i,1)], [left_hip_pos_all_FR2(i,3), left_knee_pos_FR2(i,3)], [left_hip_pos_all_FR2(i,2), left_knee_pos_FR2(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 3, 'HandleVisibility', 'off');
+            line([left_knee_pos_FR2(i,1), left_ankle_pos_FR2(i,1)], [left_knee_pos_FR2(i,3), left_ankle_pos_FR2(i,3)], [left_knee_pos_FR2(i,2), left_ankle_pos_FR2(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 3, 'HandleVisibility', 'off');
+            line([right_hip_pos_all_FR2(i,1), right_knee_pos_FR2(i,1)], [right_hip_pos_all_FR2(i,3), right_knee_pos_FR2(i,3)], [right_hip_pos_all_FR2(i,2), right_knee_pos_FR2(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 3, 'HandleVisibility', 'off');
+            line([right_knee_pos_FR2(i,1), right_ankle_pos_FR2(i,1)], [right_knee_pos_FR2(i,3), right_ankle_pos_FR2(i,3)], [right_knee_pos_FR2(i,2), right_ankle_pos_FR2(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 3, 'HandleVisibility', 'off');
             
             u = 0;
             v = cos(left_ankle_orientation(i));
@@ -353,7 +353,7 @@ function trajectories = plot_root_and_ankles_trajectoryFIXED(asf_file, amc_file,
         ylabel('Progression (Z) Position (m)');
         zlabel('Height (Y) Position (m)');
         title('Detailed 3D Trajectory');
-        legend('Root', 'Left Ankle', 'Right Ankle', 'Left Knee', 'Right Knee', 'Start', 'End', 'Location', 'best');
+        legend('Pelvis', 'Left Ankle', 'Right Ankle', 'Left Knee', 'Right Knee', 'Start', 'End', 'Location', 'best');
         grid on;
         axis equal;
         view(3);
@@ -366,22 +366,22 @@ function trajectories = plot_root_and_ankles_trajectoryFIXED(asf_file, amc_file,
         plot(right_knee_pos_FR2(:,3), right_knee_pos_FR2(:,2), 'b:', 'LineWidth', 1.5);
 
         for i = 1:inter_space:size(D, 1)
-            line([left_hip_pos_all_FR2(i,3), left_knee_pos_FR2(i,3)], [left_hip_pos_all_FR2(i,2), left_knee_pos_FR2(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
-            line([left_knee_pos_FR2(i,3), left_ankle_pos_FR2(i,3)], [left_knee_pos_FR2(i,2), left_ankle_pos_FR2(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
-            line([right_hip_pos_all_FR2(i,3), right_knee_pos_FR2(i,3)], [right_hip_pos_all_FR2(i,2), right_knee_pos_FR2(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
-            line([right_knee_pos_FR2(i,3), right_ankle_pos_FR2(i,3)], [right_knee_pos_FR2(i,2), right_ankle_pos_FR2(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 1.5, 'HandleVisibility', 'off');
+            line([left_hip_pos_all_FR2(i,3), left_knee_pos_FR2(i,3)], [left_hip_pos_all_FR2(i,2), left_knee_pos_FR2(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 3, 'HandleVisibility', 'off');
+            line([left_knee_pos_FR2(i,3), left_ankle_pos_FR2(i,3)], [left_knee_pos_FR2(i,2), left_ankle_pos_FR2(i,2)], 'Color', [0.8 0.2 0.2 0.5], 'LineWidth', 3, 'HandleVisibility', 'off');
+            line([right_hip_pos_all_FR2(i,3), right_knee_pos_FR2(i,3)], [right_hip_pos_all_FR2(i,2), right_knee_pos_FR2(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 3, 'HandleVisibility', 'off');
+            line([right_knee_pos_FR2(i,3), right_ankle_pos_FR2(i,3)], [right_knee_pos_FR2(i,2), right_ankle_pos_FR2(i,2)], 'Color', [0.2 0.2 0.8 0.5], 'LineWidth', 3, 'HandleVisibility', 'off');
 
             u = cos(left_ankle_orientation(i)  );
             v = sin(left_ankle_orientation(i)  );
-            quiver(left_ankle_pos_FR2(i,3), left_ankle_pos_FR2(i,2), u, v, 0.1, 'm', 'HandleVisibility', 'off');
+            quiver(left_ankle_pos_FR2(i,3), left_ankle_pos_FR2(i,2), u, v, 0.1, 'r', 'HandleVisibility', 'off');
 
             u = cos(right_ankle_orientation(i)  );
             v = sin(right_ankle_orientation(i)  );
-            quiver(right_ankle_pos_FR2(i,3), right_ankle_pos_FR2(i,2), u, v, 0.1, 'c', 'HandleVisibility', 'off');
+            quiver(right_ankle_pos_FR2(i,3), right_ankle_pos_FR2(i,2), u, v, 0.1, 'b', 'HandleVisibility', 'off');
 
             v = cosd(root_rot(i, 1));
             w = sind(root_rot(i, 1));
-            quiver(root_pos(i,3), root_pos(i,2), v, w, 0.1, 'm', 'HandleVisibility', 'off');
+            quiver(root_pos(i,3), root_pos(i,2), v, w, 0.1, 'r', 'HandleVisibility', 'off');
         end
 
         xlabel('Progression (Z) Position (m)');

@@ -8,8 +8,8 @@ clear;
 addpath('./Functions_rev/');
 addpath('./Gait Data/');
 
-subject = '35'; %07 %39*
-filename = sprintf('./Gait Data/all_trajectories_ALL-10#%s.mat', subject);
+subject = '39'; %07 %39*
+filename = sprintf('./Gait Data/all_trajectories_ALL#%s.mat', subject);
 
 % Load the all_trajectories data
 load(filename, 'all_trajectories');
@@ -18,7 +18,7 @@ load(filename, 'all_trajectories');
 sampling_freq = 120; % Hz
 dt = 1 / sampling_freq; % secondsidx
 cutoff_freq = 6; % Hz for Butterworth filter
-target_resample_points = 50; % for resampling
+target_resample_points = 200; % for resampling
 velocity_reduction_factor = 0.5; % Factor to reduce velocity
 
 p1_processed_gait_data = cell(size(all_trajectories));
@@ -150,10 +150,11 @@ for i=1:size(processed_gait_data, 2)
     processed_gait_data{i}.ankle_A_FR2 = reshape(processed_gait_data{i}.ankle_A_FR2, [target_resample_points, 2, 2]);
 end
 
-% processed_gait_data = set_lastPoint_FR1(processed_gait_data);
+%SELECTING ONLY ONE GAIT CYCLE --REMOVE
+% processed_gait_data = processed_gait_data{1};
 
 % % Save the processed data
-output_file = sprintf('./Gait Data/new_processed_gait_data#%s_%d.mat', subject,size(processed_gait_data, 2));
+output_file = sprintf('./Gait Data/new_processed_gait_data#%s_%d_p%d.mat', subject,size(processed_gait_data, 2), target_resample_points);
 save(output_file, 'processed_gait_data');
 
 fprintf('All gait data processed and saved to %s\n', output_file);

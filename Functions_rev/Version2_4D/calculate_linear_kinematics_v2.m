@@ -58,13 +58,13 @@ function linear_kinematics = calculate_linear_kinematics_v2(processed_data, phi)
 
     % Helper function for forward kinematics calculation
     function [pos_rotated, vel_rotated, acc_rotated] = calculate_ankle_kinematics(hip_flex_filtered, knee_flex_filtered, hip_flex_velocity, knee_flex_velocity, hip_flex_acceleration, knee_flex_acceleration, R, l1, l2)
-        theta1 = deg2rad(-hip_flex_filtered); % hip angle
+        theta1 = deg2rad(hip_flex_filtered);     % hip angle
         theta2 = deg2rad(knee_flex_filtered);     % knee angle
 
-        theta1_dot = deg2rad(-hip_flex_velocity);
+        theta1_dot = deg2rad(hip_flex_velocity);
         theta2_dot = deg2rad(knee_flex_velocity);
 
-        theta1_ddot = deg2rad(-hip_flex_acceleration);
+        theta1_ddot = deg2rad(hip_flex_acceleration);
         theta2_ddot = deg2rad(knee_flex_acceleration);
 
         % 1. Forward Kinematics: End-effector position

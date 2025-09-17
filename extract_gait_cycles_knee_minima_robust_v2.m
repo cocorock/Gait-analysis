@@ -249,7 +249,7 @@ function [right_valid_cutted_cycles, left_valid_cutted_cycles] = extract_gait_cy
 
         if ~isempty(left_knee_valid)
             for i = 1:length(left_knee_valid)
-                xline(time(left_knee_valid(i)), 'b--', 'LineWidth', 2, 'Alpha', 0.8);
+                xline(time(left_knee_valid(i)), 'b--', 'LineWidth', 1, 'Alpha', 0.8);
                 text(time(left_knee_valid(i)), min([right_hip_flex; left_hip_flex]), ...
                      sprintf('L%d', i), 'Color', 'blue', 'FontWeight', 'bold', 'FontSize', 10);
             end
@@ -284,7 +284,7 @@ function [right_valid_cutted_cycles, left_valid_cutted_cycles] = extract_gait_cy
 
         if ~isempty(left_knee_valid)
             plot(time(left_knee_valid), left_knee_flex(left_knee_valid), ...
-                 'bo', 'MarkerSize', 8, 'MarkerFaceColor', 'blue');
+                 'bo', 'MarkerSize', 5, 'MarkerFaceColor', 'blue');
         end
 
         xlabel('Time (s)');

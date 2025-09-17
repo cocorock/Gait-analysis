@@ -23,24 +23,16 @@ fprintf('\n=== Process Plot and Save All AMC Files Completed V2 ===\n');
 % Get all AMC files from the specified directory.
 amc_files = get_amc_files();
 % Process all AMC files to extract and collect gait cycle data.
-[all_cycles_data, file_info] = process_all_amc_files_v2(amc_files, false, true);
-
-% --- MODIFICATION: Use only cycles from the right leg criterion ---
-% Clear the left leg data to ensure all subsequent analysis uses only the
-% cycles segmented based on the right leg's heel strike.
-all_cycles_data.left_leg_cycles = [];
-all_cycles_data.file_indices.left = [];
-fprintf('Modified: Using only %d cycles from the right leg criterion.\n', length(all_cycles_data.right_leg_cycles));
-% ----------------------------------------------------------------
+[all_cycles_data, file_info] = process_all_amc_files_v2(amc_files, true, true);
 
 % Apply filtering to the collected gait data and calculate derivatives.
 processed_data = apply_filtering_and_derivatives_v2(all_cycles_data);
 
 % % Ploting right leg angular kinematics
 plot_gait_kinematics_v2(processed_data, 'right');
-
+% 
 % % Ploting left leg angular kinematics
-%  plot_gait_kinematics_v2(processed_data, 'left');
+% plot_gait_kinematics_v2(processed_data, 'left');
 
 % Save the processed data in multiple formats for further analysis.
 save_processed_data_4D(processed_data);
@@ -63,6 +55,6 @@ plot_linear_kinematics_positionsV2(linear_kinematics, processed_data.time_standa
 
 plot_linear_kinematics_positions_xy(linear_kinematics);
 
-plot_linear_kinematics_velocities_xy(linear_kinematics);
-
-plot_linear_kinematics_accelerations_xy(linear_kinematics);
+% plot_linear_kinematics_velocities_xy(linear_kinematics);
+% 
+% plot_linear_kinematics_accelerations_xy(linear_kinematics);

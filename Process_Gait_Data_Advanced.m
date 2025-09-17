@@ -24,7 +24,7 @@ velocity_reduction_factor = 0.5; % Factor to reduce velocity
 p1_processed_gait_data = cell(size(all_trajectories));
 show_debug_plot = true;
 
-if false
+if true
     figure(6)
     hold on;
     for i=1:size(all_trajectories)

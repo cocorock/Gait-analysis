@@ -37,7 +37,7 @@ end
 %         flag10 = true;
 %     end
 % end
-flag10 =  true;
+flag10 =  false;
 
   if ~flag10  
     output_file = sprintf('./Gait Data/all_trajectories_ALL-10#%s.mat', amc_file(1:2));

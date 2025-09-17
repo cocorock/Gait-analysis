@@ -92,15 +92,22 @@ function [time, right_hip_flex, left_hip_flex, right_knee_flex, left_knee_flex] 
         error('No valid frame data found in file');
     end
     
-%     disp(frame_data)
+%      disp(frame_data)
     
-    hip_offset_angle = -0;
+    % Determine hip offset angle based on filename
+    [~, name, ~] = fileparts(filename);
+    if startsWith(name, '39_')
+        hip_offset_angle = 18; %subject 39
+    else
+        hip_offset_angle = 0;
+    end
+
     % Extract data
     frames = frame_data(:, 1);
-    right_hip_flex = -frame_data(:, 2)+hip_offset_angle;  % Flip hip flexion/extension
-    left_hip_flex = -frame_data(:, 3)+hip_offset_angle;   % Flip hip flexion/extension
+    right_hip_flex = frame_data(:, 2) + hip_offset_angle;  % Flip hip flexion/extension
+    left_hip_flex  = frame_data(:, 3) + hip_offset_angle;   % Flip hip flexion/extension
     right_knee_flex = frame_data(:, 4);  % Keep knee as is
-    left_knee_flex = frame_data(:, 5);   % Keep knee as is
+    left_knee_flex  = frame_data(:, 5);   % Keep knee as is
 
     % Create time vector (assuming 120 fps)
     fps = 120;

@@ -6,26 +6,37 @@ import argparse
 
 def clean_value(value):
     """Recursively cleans MATLAB data types for JSON serialization."""
-    if isinstance(value, np.void):
-        # Handle scalar struct
-        return {name: clean_value(value[name]) for name in value.dtype.names}
-    elif isinstance(value, np.ndarray):
-        # Handle struct array or cell array
+    # If it's a numpy array
+    if isinstance(value, np.ndarray):
+        # If it's a structured array (a MATLAB struct)
         if value.dtype.names:
-            return [clean_value(v) for v in value]
-        # Handle regular array
+            # If it is 0-dimensional, it's a single struct; convert to dict
+            if value.ndim == 0:
+                return {name: clean_value(value[name].item()) for name in value.dtype.names}
+            # Otherwise, it's an array of structs; convert to list of dicts
+            else:
+                return [clean_value(v) for v in value]
+        # If it's a regular numpy array, convert to a list
         else:
             return value.tolist()
+    
+    # If it's a scalar struct that has been extracted by .item()
+    elif isinstance(value, np.void):
+        return {name: clean_value(value[name]) for name in value.dtype.names}
+
+    # Handle scalar types that are wrapped in numpy types
     elif isinstance(value, (np.generic, np.number)):
-        # Handle numpy scalars
         return value.item()
-    elif isinstance(value, (dict, list, str, int, float, bool)):
-        # Python native types are already JSON serializable
+
+    # Return other Python-native types as is
+    elif isinstance(value, (int, float, str, list, dict)):
         return value
+    
     elif value is None:
         return None
+
+    # Fallback for any other unknown type
     else:
-        # Fallback for any other type
         return str(value)
 
 def main():

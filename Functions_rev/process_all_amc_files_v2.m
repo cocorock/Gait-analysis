@@ -1,25 +1,29 @@
 %% process_all_amc_files_v2: Processes all AMC files and collects gait cycles from the v2 extractor.
-%
+% 
 % Credits:
 %   Victor Ferman, Adrolab FEEC/UNICAMP
 %   (Modified by Gemini)
-%
+% 
 % Description:
 %   This function iterates through all specified AMC files, extracts the gait
 %   cycles using the robust v2 detection method, interpolates them to a standard
-%   length, and collects them into a single data structure, keeping right and
-%   left leg cycles separate.
-%
+%   length, and collects them into a single data structure. It now also stores 
+%   the duration of each cycle and the mean duration for each leg.
+% 
 % Input:
 %   amc_files - struct array: A list of AMC files to process.
 %   show_debug_plot - (optional) boolean: If true, displays a debug plot for each file. Default is false.
 %   enable_printing - (optional) boolean: If true, enables detailed print statements. Default is false.
-%
+%   interp_length - (optional) scalar: The number of points for interpolation. Default is 200.
+% 
 % Output:
 %   all_cycles_data - struct: Contains all extracted and processed gait cycle data.
 %   file_info       - struct: Contains information about the processed files.
 
-function [all_cycles_data, file_info] = process_all_amc_files_v2(amc_files, show_debug_plot, enable_printing)
+function [all_cycles_data, file_info] = process_all_amc_files_v2(amc_files, show_debug_plot, enable_printing, interp_length)
+    if nargin < 4
+        interp_length = 200;
+    end
     fprintf('\n=== PROCESSING ALL FILES (V2) ===\n');
     
     % Initialize storage
@@ -35,8 +39,11 @@ function [all_cycles_data, file_info] = process_all_amc_files_v2(amc_files, show
     file_info.colors = lines(length(amc_files));
     file_info.total_cycles = 0;
     
-    % Interpolation parameters
-    interp_length = 200;
+    % Initialize arrays to collect all cycle durations
+    all_right_durations = [];
+    all_left_durations = [];
+
+    % Interpolation parameters are now passed in as an argument.
     time_standard = linspace(0, 1, interp_length);
     
     for file_idx = 1:length(amc_files)
@@ -67,6 +74,8 @@ function [all_cycles_data, file_info] = process_all_amc_files_v2(amc_files, show
                 interpolated_cycle.left_hip_flex = interp1(time_norm, cycle.left_hip_flex, time_standard, 'linear');
                 interpolated_cycle.right_knee_flex = interp1(time_norm, cycle.right_knee_flex, time_standard, 'linear');
                 interpolated_cycle.left_knee_flex = interp1(time_norm, cycle.left_knee_flex, time_standard, 'linear');
+                interpolated_cycle.duration = cycle.duration; % Store the original cycle duration
+                all_right_durations = [all_right_durations; cycle.duration]; % Accumulate duration
 
                 % Store interpolated data
                 all_cycles_data.right_leg_cycles = [all_cycles_data.right_leg_cycles; interpolated_cycle];
@@ -84,6 +93,8 @@ function [all_cycles_data, file_info] = process_all_amc_files_v2(amc_files, show
                 interpolated_cycle.left_hip_flex = interp1(time_norm, cycle.left_hip_flex, time_standard, 'linear');
                 interpolated_cycle.right_knee_flex = interp1(time_norm, cycle.right_knee_flex, time_standard, 'linear');
                 interpolated_cycle.left_knee_flex = interp1(time_norm, cycle.left_knee_flex, time_standard, 'linear');
+                interpolated_cycle.duration = cycle.duration; % Store the original cycle duration
+                all_left_durations = [all_left_durations; cycle.duration]; % Accumulate duration
 
                 % Store interpolated data
                 all_cycles_data.left_leg_cycles = [all_cycles_data.left_leg_cycles; interpolated_cycle];
@@ -97,7 +108,11 @@ function [all_cycles_data, file_info] = process_all_amc_files_v2(amc_files, show
     
     all_cycles_data.time_standard = time_standard;
     
+    % Calculate and store the mean duration for each leg
+    all_cycles_data.mean_duration_right = mean(all_right_durations);
+    all_cycles_data.mean_duration_left = mean(all_left_durations);
+
     fprintf('\nTotal cycles collected: %d\n', file_info.total_cycles);
-    fprintf('Right leg cycles: %d\n', length(all_cycles_data.right_leg_cycles));
-    fprintf('Left leg cycles: %d\n', length(all_cycles_data.left_leg_cycles));
+    fprintf('Right leg cycles: %d (Mean Duration: %.3fs)\n', length(all_cycles_data.right_leg_cycles), all_cycles_data.mean_duration_right);
+    fprintf('Left leg cycles: %d (Mean Duration: %.3fs)\n', length(all_cycles_data.left_leg_cycles), all_cycles_data.mean_duration_left);
 end
